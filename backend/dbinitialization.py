@@ -115,30 +115,18 @@ def downloadFile(fileURL,fileName,eventName):
 
 def loadTable(eventName, dropIfExists, createTable, tableFile, table):
 
-    def basics(cur, line):
-        try:
-            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8]))
-        except:
-            pass
-            
-    def episodes(cur, line):
-        if line[2].isdigit():
-            cur.execute("INSERT INTO EpisodeDB VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3]))
-    
-    def ratings(cur, line):
-        try:
-            rating=float(line[1])
-            cur.execute("INSERT INTO RatingsDB(TitleID,Rating) VALUES(?,?);",(line[0],rating))
-        except:
-            pass
-        
-    def crew(cur, line):
-        cur.execute("INSERT INTO CrewDB(TitleID, DirectorID) VALUES(?,?);", (line[0], line[1]))
-
-    def people(cur, line):
-        cur.execute("INSERT INTO PeopleDB(PersonID, Name, Professions, WorkedIn) VALUES(?,?,?,?);", (line[0], line[1], line[4], line[5]))
-
-    insert= {"basics": basics, "episodes": episodes, "ratings": ratings, "crew": crew, "people": people}
+    insert= {
+        "basics": lambda cur, line : 
+            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8])),
+        "episodes": lambda cur, line : 
+            cur.execute("INSERT INTO EpisodeDB VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
+        "ratings": lambda cur, line :
+            cur.execute("INSERT INTO RatingsDB(TitleID,Rating) VALUES(?,?);",(line[0],float(line[1]))),
+        "crew": lambda cur, line :
+            cur.execute("INSERT INTO CrewDB(TitleID, DirectorID) VALUES(?,?);", (line[0], line[1])),
+        "people": lambda cur, line :
+            cur.execute("INSERT INTO PeopleDB(PersonID, Name, Professions, WorkedIn) VALUES(?,?,?,?);", (line[0], line[1], line[4], line[5]))
+        }
 
     eventName.wait()
     try:
@@ -149,7 +137,10 @@ def loadTable(eventName, dropIfExists, createTable, tableFile, table):
         with gzip.open(tableFile, 'rb') as infile:
             reader=unicodecsv.reader(infile,delimiter="\t")
             for line in reader:
-                insert[table](cur, line)
+                try:
+                    insert[table](cur, line)
+                except:
+                    pass
         conn.commit()
         conn.close()
     except IOError:
