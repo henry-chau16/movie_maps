@@ -1,21 +1,10 @@
-import gzip
-import unicodecsv
 import requests
 import threading
 import time
-import os
-import sqlite3
+import dbfunctions
 
 
-def dbExists():
-    """
-    function that checks to see if the television.db file exists in the current working directory
-    :return:
-    """
-    path=os.getcwd()
-    if "television.db" in os.listdir():
-        return True
-    return False
+
 
 def loadDB():
     """
@@ -25,7 +14,7 @@ def loadDB():
     :return:
     """
 
-    if (dbExists()):
+    if (dbfunctions.dbExists()):
         proceed=""
         while proceed.upper().strip() not in ('Y','N'):
             proceed=input("The television series database is already available in your directory.  Do you want to update it? (Y/N)")
@@ -40,57 +29,73 @@ def loadDB():
     e4=threading.Event()
     e5=threading.Event()
 
+
     t1=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.episode.tsv.gz", "title.episode.tsv.gz",e1))
     t2=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.ratings.tsv.gz", "title.ratings.tsv.gz",e2))
     t3=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.basics.tsv.gz", "title.basics.tsv.gz",e3))
     t4=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.crew.tsv.gz", "title.crew.tsv.gz", e4))
     t5=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/name.basics.tsv.gz", "name.basics.tsv.gz", e5))
+
+    threads = [t1, t2, t3, t4, t5]
     
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-    t5.start()
+    for t in threads:
+        t.start()
 
     queryDict = {
-        "episodes" : ("EpisodeDB",
+        "episodes" : (
+            e1,
+            "EpisodeDB",
             "CREATE TABLE EpisodeDB(TitleID TEXT not null,ParentID TEXT not null, SeasonNum INTEGER not null, EpisodeNum INTEGER not null)",
-            'title.episode.tsv.gz',
-            "episodes"
+            'title.episode.tsv.gz'
             ),
-        "ratings" : ("RatingsDB",
-            "CREATE TABLE RatingsDB(TitleID TEXT unique not null, Rating REAL)",
-            'title.ratings.tsv.gz',
-            "ratings"
+        "ratings" : (
+            e2,
+            "RatingsDB",
+            "CREATE TABLE RatingsDB(TitleID TEXT unique not null, AccountID TEXT, Rating REAL, Review TEXT)",
+            'title.ratings.tsv.gz'
             ),
-        "basics" : ("TelevisionDB",
+        "basics" : (
+            e3,
+            "TelevisionDB",
             "CREATE TABLE TelevisionDB(TitleID TEXT unique not null, TitleName TEXT not null, TitleType TEXT not null, StartYear TEXT, EndYear TEXT, Genre TEXT)",
-            'title.basics.tsv.gz',
-            "basics"
+            'title.basics.tsv.gz'
             ),
-        "crew" : ("CrewDB",
+        "crew" : (
+            e4,
+            "CrewDB",
             "CREATE TABLE CrewDB(TitleID TEXT unique not null, DirectorID TEXT)",
-            'title.crew.tsv.gz',
-            "crew"
+            'title.crew.tsv.gz'
             ),
-        "people" : ("PeopleDB",
+        "people" : (
+            e5,
+            "PeopleDB",
             "CREATE TABLE PeopleDB(PersonID TEXT unique not null, Name Text not null, Professions TEXT, WorkedIn TEXT)",
-            'name.basics.tsv.gz',
-            "people"
+            'name.basics.tsv.gz'
             )
     }
-    loadTable(e1, *queryDict["episodes"])
-    loadTable(e2, *queryDict["ratings"])
-    loadTable(e3, *queryDict["basics"])
-    loadTable(e4, *queryDict["crew"])
-    loadTable(e5, *queryDict["people"])
 
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
-    t5.join()
-    cleanEpisodeDB()
+    insert= {
+        "basics": lambda cur, line : 
+            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8])),
+        "episodes": lambda cur, line : 
+            cur.execute("INSERT INTO EpisodeDB VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
+        "ratings": lambda cur, line :
+            cur.execute("INSERT INTO RatingsDB(TitleID,Rating) VALUES(?,?,?);",(line[0], "N/A",float(line[1])),"N/A"),
+        "crew": lambda cur, line :
+            cur.execute("INSERT INTO CrewDB(TitleID, DirectorID) VALUES(?,?);", (line[0], line[1])),
+        "people": lambda cur, line :
+            cur.execute("INSERT INTO PeopleDB(PersonID, Name, Professions, WorkedIn) VALUES(?,?,?,?);", (line[0], line[1], line[4], line[5]))
+        }
+
+
+    for key in queryDict:
+        dbfunctions.createTable(*queryDict[key])
+        dbfunctions.loadTable(queryDict[key][0], key, queryDict[key][3], insert)
+
+    for t in threads:
+        t.join()
+
+    dbfunctions.cleanEpisodeDB()
 
 
     print(time.time() - start)
@@ -113,64 +118,5 @@ def downloadFile(fileURL,fileName,eventName):
         print ("{:s} not found".format(fileURL))
         return 404
 
-def loadTable(eventName, dropIfExists, createTable, tableFile, table):
-
-    insert= {
-        "basics": lambda cur, line : 
-            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8])),
-        "episodes": lambda cur, line : 
-            cur.execute("INSERT INTO EpisodeDB VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
-        "ratings": lambda cur, line :
-            cur.execute("INSERT INTO RatingsDB(TitleID,Rating) VALUES(?,?);",(line[0],float(line[1]))),
-        "crew": lambda cur, line :
-            cur.execute("INSERT INTO CrewDB(TitleID, DirectorID) VALUES(?,?);", (line[0], line[1])),
-        "people": lambda cur, line :
-            cur.execute("INSERT INTO PeopleDB(PersonID, Name, Professions, WorkedIn) VALUES(?,?,?,?);", (line[0], line[1], line[4], line[5]))
-        }
-
-    eventName.wait()
-    try:
-        conn=sqlite3.connect('television.db')
-        cur = conn.cursor()
-        cur.execute("DROP TABLE IF EXISTS "+dropIfExists)
-        cur.execute(createTable)
-        with gzip.open(tableFile, 'rb') as infile:
-            reader=unicodecsv.reader(infile,delimiter="\t")
-            for line in reader:
-                try:
-                    insert[table](cur, line)
-                except:
-                    pass
-        conn.commit()
-        conn.close()
-    except IOError:
-            print("Error opening: "+tableFile)
-            return -1
-    return 0
-
-def cleanEpisodeDB():
-    """
-    function to delete all records in the episode DB which do not have associated ratings data
-    :return:
-    """
-    command="delete from EpisodeDB where titleID not in (select distinct titleID from RatingsDB)"
-    SQLConn("television.db",command)
-
-def SQLConn(database, command):
-    """
-    Function to make SQl connection to database and perform passed command.  Opens connection, executes command,
-    commits and closes connection.
-    :param database: database file to connect to
-    :param command: sql command to execute
-    :return: result of SQL command
-    """
-    conn=sqlite3.connect(database)
-    cur=conn.cursor()
-    cur.execute(command)
-    result=cur.fetchall()
-    #print(result)
-    conn.commit()
-    conn.close()
-    return result
 
 loadDB()
