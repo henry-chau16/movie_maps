@@ -42,9 +42,13 @@ def search_title(title: str):
     except Exception as e:
         raise HTTPException(status_code=404, detail="Cannot search by title") 
 
-'''
-@app.get("/search/crew/{crew})
-'''
+@app.get("/search/crew/{crew}")
+def search_crew(crew: str):
+    try:
+        return search_filter.searchCrew(crew)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Cannot search by crew")
+        
 
 #reviews
 ''' Create, read, update, delete 
