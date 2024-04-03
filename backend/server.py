@@ -19,6 +19,13 @@ app.add_middleware(
 def getRoot():
     return {"message": "testing root"}
 
+#entering title 
+@app.get("/{id}")
+def get_title(id: str):
+    try: 
+        return search_filter.enterTitle(id)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Cannot find the title")
 #filter
 @app.get("/filter/genre/{genre}")
 def filter_genre(genre: str):

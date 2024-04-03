@@ -20,7 +20,7 @@ def filterGenre(genres):
     
     command += " OR ".join(genre_conditions) 
 
-    command=command + " order by titleName"
+    command=command + " order by titleName LIMIT 50"
     return SQLConn("television.db",command)
 
 def filterYears(startYr, endYr):
@@ -38,7 +38,7 @@ def filterYears(startYr, endYr):
     else:
         command = "Select titleID, titleName,startYear,endYear, genre " \
             "from TelevisionDB t " \
-            "where startYear = '{sY}' order by titleName".format(sY = startYr)
+            "where startYear = '{sY}' order by titleName LIMIT 50".format(sY = startYr)
         
     return SQLConn("television.db", command)
 
@@ -54,7 +54,12 @@ def searchTitle(searchValue):
     command="Select TitleName, TitleType, StartYear, EndYear " \
             "from TelevisionDB " \
             "where TitleName like '%{:s}%'".format(sv)
-    command=command + " order by titleName LIMIT 5"
+    command=command + " order by titleName LIMIT 50"
+    return SQLConn("television.db",command)
+
+def enterTitle(titleID): 
+    id = titleID.strip()
+    command = "Select * from TelevisionDB where TitleID = '{id}'".format(id = id)
     return SQLConn("television.db",command)
 
 def SQLConn(database, command):
