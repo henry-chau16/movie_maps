@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 
 export default function Home() { 
     const[openFilter, setOpenFilter] = useState(false); 
+    const[searchQuery, setSearchQuery] = useState(''); 
+
     const [titles, setTitles] = useState([
         { id: 1, name: "Title 1" },
         { id: 2, name: "Title 2" },
@@ -15,19 +17,26 @@ export default function Home() {
         setOpenFilter(!openFilter);
         console.log("filter button clicked")
     }
+
+    async function handleEnterTitle() { 
+        
+    }
     
     return (
         <div className = "Home">
             <Navigation/>
-            {openFilter && <Filter/>}
             <button onClick = {() => handleOpenFilter()}>FilterPlaceholder</button>
             <input
                 type = "text"
                 placeholder = "Search by title or crew"
                 onKeyDown={(event) => { 
                     if (event.key === 'Enter') { 
-                        console.log("Enter key clicked")
+                        event.preventDefault();
+                        handleEnterTitle();
                     }
+                }}
+                onChange={event => {
+                    setSearchQuery(event.target.value);
                 }}
             />
             {titles && titles.map((title) => (
@@ -35,6 +44,7 @@ export default function Home() {
                     <button>{title.name}</button>
                 </Link>
             ))}
+             {openFilter && <Filter/>}
         </div>
     )
 }

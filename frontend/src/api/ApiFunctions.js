@@ -1,12 +1,6 @@
-import React, {createContext} from 'react';
+//Context not needed here, use it for authentication instead
 
-/* Creates a context object, which providing values with ApiProvider containing API calls
-and passes it to children. Reduces use of props. */
-
-const ApiContext = createContext();
-
-export const ApiProvider = ({children}) => { 
-    //insert functions here. later for authentication
+export default function ApiFunctions() { 
     const backendUrl = 'http://localhost:8000'
     //Too much data currently. Try to filter out the movies or just episodes if not possible
     /*
@@ -30,7 +24,7 @@ export const ApiProvider = ({children}) => {
         }
     }
 
-    const enterByTitle = async(titleID) => {
+    const enterTitle = async(titleID) => {
         try { 
             const response = await fetch(backendUrl + `/${titleID}`);
             const data = await response.json();
@@ -39,15 +33,4 @@ export const ApiProvider = ({children}) => {
           console.error('There was a problem with the fetch operation:', error);
         }
     }
-
-    const contextData = { 
-        searchByTitle: searchByTitle,
-        enterByTitle: enterByTitle
-    }
-
-    return (
-        <ApiContext.Provider value ={contextData}>
-            {children}
-        </ApiContext.Provider>
-    )
 }
