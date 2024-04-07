@@ -1,4 +1,7 @@
+
+
 export default function Filter() { 
+
     return (
         <div className = "filter">
             <ul> 
@@ -6,7 +9,7 @@ export default function Filter() {
                     <ul>Movies</ul>
                     <ul>Series</ul>
                 <li>Genre</li>
-                <form>
+                <form onSubmit={handleFilterGenres}>
                     {['Action', 'Adventure', 'Animation', 'Comedy', 'Drama', 'Documentary', 'Fantasy', 'Horror', 'Sci-Fi'].map((genre) => (
                         <div key={genre}>
                             <input type="checkbox" id={genre} />
@@ -16,7 +19,7 @@ export default function Filter() {
                     <input type="submit" value="Search"/>
                 </form>
                 <li>Years</li>
-                <form>
+                <form onSubmit={handleFilterYears}>
                     <input
                     type = "text"
                     placeholder = "Start Year"

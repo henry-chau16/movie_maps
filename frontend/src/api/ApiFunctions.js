@@ -1,6 +1,5 @@
 //Context not needed here, use it for authentication instead
 
-export default function ApiFunctions() { 
     const backendUrl = 'http://localhost:8000'
     //Too much data currently. Try to filter out the movies or just episodes if not possible
     /*
@@ -14,7 +13,7 @@ export default function ApiFunctions() {
         }
     } */
 
-    const searchByTitle = async(searchTitle) => { 
+    export async function searchByTitle(searchTitle) { 
         try { 
             const response = await fetch(backendUrl + `/search/title/${searchTitle}`);
             const data = await response.json();
@@ -24,7 +23,7 @@ export default function ApiFunctions() {
         }
     }
 
-    const enterTitle = async(titleID) => {
+    export async function enterTitle(titleID) {
         try { 
             const response = await fetch(backendUrl + `/${titleID}`);
             const data = await response.json();
@@ -33,4 +32,3 @@ export default function ApiFunctions() {
           console.error('There was a problem with the fetch operation:', error);
         }
     }
-}
