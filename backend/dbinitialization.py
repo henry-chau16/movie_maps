@@ -76,11 +76,12 @@ def loadDB():
 
     insert= {
         "basics": lambda cur, line : 
-            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8])),
+            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8]))
+            if line[1] != 'short' and line[1] != 'tvEpisode' else 0,
         "episodes": lambda cur, line : 
             cur.execute("INSERT INTO EpisodeDB VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
         "ratings": lambda cur, line :
-            cur.execute("INSERT INTO RatingsDB(TitleID,Rating) VALUES(?,?,?);",(line[0], "N/A",float(line[1])),"N/A"),
+            cur.execute("INSERT INTO RatingsDB(TitleID, AccountID, Rating, Review) VALUES(?,?,?,?);",(line[0], "N/A",float(line[1]),"N/A")),
         "crew": lambda cur, line :
             cur.execute("INSERT INTO CrewDB(TitleID, DirectorID) VALUES(?,?);", (line[0], line[1])),
         "people": lambda cur, line :
@@ -95,7 +96,7 @@ def loadDB():
     for t in threads:
         t.join()
 
-    dbfunctions.cleanEpisodeDB()
+    
 
 
     print(time.time() - start)
