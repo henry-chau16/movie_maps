@@ -1,9 +1,10 @@
-import { useContext, useState } from "react";
+import {useState, useEffect } from "react";
 import Navigation from "../components/Navigation";
 import Filter from "../components/Filter";
 import { Link } from "react-router-dom";
 import { searchByTitle } from "../api/ApiFunctions"
 
+//maybe store the search result with sessions later to avoid too much reload
 export default function Home() { 
     const[openFilter, setOpenFilter] = useState(false); 
     const[searchQuery, setSearchQuery] = useState(''); 
@@ -11,15 +12,17 @@ export default function Home() {
 
     const [titles, setTitles] = useState([]);
 
+    useEffect(() => { //replace with call to api once results limited
+        setTitles([["123456789", "Placeholder"]])
+    }, []); 
+
     const handleOpenFilter = () => { 
         setOpenFilter(!openFilter);
-        console.log("filter button clicked")
     }
 
     async function handleSearchTitle() { 
         setLoading(true);
         const apiResponse = await searchByTitle(searchQuery);
-        console.log("API Response:", apiResponse);
         setTitles(apiResponse);
         setLoading(false);
     }
@@ -44,8 +47,8 @@ export default function Home() {
                     }}
                 />
                 {titles && titles.map((title) => (
-                    <Link key={title.id} to={`/title/${title.id}`}>
-                        <button>{title.name}</button>
+                    <Link key={title[0]} to={`/title/${title[0]}`}>
+                        <button>{title[1]}</button>
                     </Link>
                 ))}
             </div>

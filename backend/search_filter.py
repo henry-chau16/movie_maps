@@ -51,7 +51,7 @@ def searchTitle(searchValue):
     """
     sv=searchValue.strip()
 
-    command="Select TitleName, TitleType, StartYear, EndYear " \
+    command="Select * " \
             "from TelevisionDB " \
             "where TitleName like '%{:s}%'".format(sv)
     command=command + " order by titleName LIMIT 50"

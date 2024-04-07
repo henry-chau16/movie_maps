@@ -45,6 +45,7 @@ def filter_years(startYr: str = Query(...), endYr: str = "n"):
 @app.get("/search/title/{title}")
 def search_title(title: str):
     try:
+        print("testing")
         return search_filter.searchTitle(title)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Cannot search by title") 
@@ -69,4 +70,4 @@ def search_crew(crew: str):
 #visualization
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="localhost", port=8000, reload=True)
+    uvicorn.run("server:app", host="localhost", port=8000)

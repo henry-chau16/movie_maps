@@ -2,6 +2,14 @@
 
 export default function Filter() { 
 
+    function handleFilterYears() { 
+        
+    }
+
+    function handleFilterGenres() { 
+
+    }
+
     return (
         <div className = "filter">
             <ul> 
