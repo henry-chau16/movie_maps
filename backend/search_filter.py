@@ -1,6 +1,6 @@
 import sqlite3
 
-def filterGenre(genres):
+def filterGenre(conn, genres):
     """
     Function to filter by genre in televisionDB table for search value
     :param genres: list to match to genres
@@ -21,9 +21,9 @@ def filterGenre(genres):
     command += " OR ".join(genre_conditions) 
 
     command=command + " order by titleName LIMIT 50"
-    return SQLConn("television.db",command)
+    return SQLConn(conn, "television.db",command)
 
-def filterYears(startYr, endYr):
+def filterYears(conn, startYr, endYr):
     """
     Function to filter by years in televisionDB table by start and end year.
     :param startYr: int to match to startYear endYr: int to match to endYear
@@ -40,9 +40,9 @@ def filterYears(startYr, endYr):
             "from TelevisionDB t " \
             "where startYear = '{sY}' order by titleName LIMIT 50".format(sY = startYr)
         
-    return SQLConn("television.db", command)
+    return SQLConn(conn, "television.db", command)
 
-def searchTitle(searchValue):
+def searchTitle(conn, searchValue):
     """
     Function to search titleName in televisionDB table for search value
     :param searchValue: string to match to titleName
@@ -55,14 +55,14 @@ def searchTitle(searchValue):
             "from TelevisionDB " \
             "where TitleName like '%{:s}%'".format(sv)
     command=command + " order by titleName LIMIT 50"
-    return SQLConn("television.db",command)
+    return SQLConn(conn, "television.db",command)
 
-def enterTitle(titleID): 
+def enterTitle(conn, titleID): 
     id = titleID.strip()
     command = "Select * from TelevisionDB where TitleID = '{id}'".format(id = id)
-    return SQLConn("television.db",command)
+    return SQLConn(conn, "television.db",command)
 
-def SQLConn(database, command):
+def SQLConn(conn, database, command):
     """
     Function to make SQl connection to database and perform passed command.  Opens connection, executes command,
     commits and closes connection.
@@ -71,13 +71,11 @@ def SQLConn(database, command):
     :return: result of SQL command
     """
     try:
-        conn=sqlite3.connect(database)
         cur=conn.cursor()
         cur.execute(command)
         result=cur.fetchall()
         #print(result)
         conn.commit()
-        conn.close()
         return result
     except Exception as e:
         print (e)
