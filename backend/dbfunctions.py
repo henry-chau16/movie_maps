@@ -29,16 +29,15 @@ def dbExists():
         return True
     return False
 
-def createTable(conn, eventName, dropIfExists, create, tableFile = "N/A"):
+def createTable(conn, eventName, tableName, create, tableFile = "N/A"):
     if (eventName != None):
         eventName.wait()
     try:
         cur=conn.cursor()
-        print("-- creating table: "+dropIfExists)
-        cur.execute("DROP TABLE IF EXISTS "+dropIfExists)
+        print("-- creating table: "+tableName)
         cur.execute(create)
     except IOError:
-            print("Error opening: "+tableFile)
+            print("Error creating: "+tableName)
             return -1
     return 0
 
@@ -62,6 +61,32 @@ def loadTable(conn, eventName, table, tableFile, queries):
         return -1
     return 0
 
+def dropTable(conn, eventName, tableName):
+    if (eventName != None):
+        eventName.wait()
+    try:
+        cur=conn.cursor()
+        cur.execute("DROP TABLE IF EXISTS "+tableName)
+        print("-- deleting table: "+ tableName)
+    except IOError:
+            print("Error deleting: "+tableName)
+            return -1
+    return 0
+
+def addRow(conn, table, fields, valueString):
+
+    input = "INSERT INTO "+table+"("+fields+") VALUES ("+valueString+");"
+    return sqlDML(conn, input)
+
+def deleteRow(conn, table, field, value):
+
+    input = "DELETE FROM "+table+" WHERE "+field +" = "+value+";"
+    return sqlDML(conn, input)
+
+def updateRow(conn, table, updateField, updateValue, field, value):
+    input = "UPDATE "+table+" SET "+updateField+" = "+updateValue+ " WHERE "+field+" = "+value+";"
+    return sqlDML(conn, input)
+
 def cleanEpisodeDB():
     """
     function to delete all records in the episode DB which do not have associated ratings data
@@ -69,6 +94,16 @@ def cleanEpisodeDB():
     """
     command="delete from EpisodeDB where titleID not in (select distinct titleID from RatingsDB)"
     SQLConn("television.db",command)
+
+def sqlDML(conn, input):
+    try:
+        cur=conn.cursor()
+        cur.execute(input)
+        conn.commit()
+    except IOError:
+        print("Error processing query: "+ input)
+        return -1
+    return 0
 
 def SQLConn(conn, database, command):
     """

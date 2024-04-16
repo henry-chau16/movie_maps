@@ -2,36 +2,48 @@ import dbfunctions
 import os
 import hashlib
 
-def createAccount(accID, username, password):
-    hashed_password = encrypt(password)
-    command = "INSERT INTO AccountDB(AccountID, Username, Password) VALUES (?,?,?);",
-    (accID, username, hashed_password)
+def createAccount(conn, username, password):
+    salt = generate_salt()
+    hashed_password = encrypt(password, salt)
+    command = "INSERT INTO AccountsDB(Username, HashPassword, Salt) VALUES ('"+username+"', '"+hashed_password+"', '"+salt+"');"
 
-    return dbfunctions.SQLConn("television.db", command)
+    print(command)
 
-def searchAccountID(username):
+    return dbfunctions.SQLConn(conn, "television.db", command)
+
+def searchAccountID(conn, username):
     command = "SELECT AccountID FROM AccountsDB WHERE Username = '"+username+"';"
 
-    return dbfunctions.SQLConn("television.db", command)
+    return dbfunctions.SQLConn(conn, "television.db", command)
 
-def verifyLogin(username, password):
-    hashed_password = encrypt(password)
-    command = "SELECT Password FROM AccountsDB WHERE Username = '"+username+"';"
-    pword = dbfunctions.SQLConn("television.db", command)
+def verifyLogin(conn, username, password):
+    command = "SELECT HashPassword, Salt FROM AccountsDB WHERE Username = '"+username+"';"
+    result = dbfunctions.SQLConn(conn, "television.db", command)
 
-    if(pword != None):
-        if(hashed_password != pword):
-            return False
-        else:
-            return True
+    if(result is not None):
+        print(result)
+        database_password = result[0][0]
+        salt = result[0][1]
+        hashed_password = encrypt(password, salt) #add in the salt from the database to compare
         
-def getReviews(accountID):
+        if database_password == hashed_password:
+            return True
+    return False
+
+def getReviews(conn, accountID):
     command = "SELECT Rating, Review FROM RatingsDB WHERE AccountID = " \
         "(SELECT AccountID FROM AccountsDB WHERE AccountID = '"+accountID+"');"
     
-    return(dbfunctions.SQLConn("television.db", command))
+    return(dbfunctions.SQLConn(conn, "television.db", command))
         
-def encrypt(password):
+def generate_salt():
+    return os.urandom(16).hex()
+
+def encrypt(password, salt):
+    salted_password = password + salt
     hash_object = hashlib.sha256()
-    hash_object.update(password.encode())
+    hash_object.update(salted_password.encode())
+
     return hash_object.hexdigest()
+
+conn = dbfunctions.dbConnect()

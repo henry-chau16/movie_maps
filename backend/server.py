@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import search_filter
 import dbfunctions
+import accountfunctions
 
 app = FastAPI()
 conn = dbfunctions.dbConnect()
@@ -67,9 +68,32 @@ def search_crew(crew: str):
 @app.get("/review/{id})
 '''
 
-#users 
+#users
+@app.post("/login")
+async def login(request:Request):
+    data = await request.json()
+    username = data.get("username")
+    password = data.get("password")
 
-#visualization
+    try:
+        if (accountfunctions.verifyLogin(username, password)):
+            return {"message": "Login successful"}
+        else:
+            raise HTTPException(status_code=401, detail="Invalid credentials.")
+    except:
+        raise HTTPException(status_code=500, detail="Unable to register.")
+
+@app.post("/register", status_code = 201)
+async def register(request:Request):
+    data = await request.json()
+    username = data.get("username")
+    password = data.get("password")
+    
+    try:
+        accountfunctions.createAccount(username, password)
+    except:
+        raise HTTPException(status_code=500, detail="Cannot create the user.")
+    
 
 if __name__ == "__main__":
     uvicorn.run("server:app", host="localhost", port=8000)
