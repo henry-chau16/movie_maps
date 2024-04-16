@@ -6,7 +6,7 @@ import dbfunctions
 
 
 
-def loadDB():
+def loadDB(conn):
     """
     main function that calls other functions to download the data from the internet, create the database and load data
     into the database. Uses threads for downloading data concurrently, then events letting the functions know the data
@@ -23,51 +23,34 @@ def loadDB():
 
 
     start=time.time()
-    e1=threading.Event()
-    e2=threading.Event()
-    e3=threading.Event()
-    e4=threading.Event()
-    e5=threading.Event()
-
-
-    t1=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.episode.tsv.gz", "title.episode.tsv.gz",e1))
-    t2=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.ratings.tsv.gz", "title.ratings.tsv.gz",e2))
-    t3=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.basics.tsv.gz", "title.basics.tsv.gz",e3))
-    t4=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/title.crew.tsv.gz", "title.crew.tsv.gz", e4))
-    t5=threading.Thread(target=downloadFile, args=("https://datasets.imdbws.com/name.basics.tsv.gz", "name.basics.tsv.gz", e5))
-
-    threads = [t1, t2, t3, t4, t5]
-    
-    for t in threads:
-        t.start()
 
     queryDict = {
         "episodes" : (
-            e1,
+            None,
             "EpisodeDB",
             "CREATE TABLE EpisodeDB(TitleID TEXT not null,ParentID TEXT not null, SeasonNum INTEGER not null, EpisodeNum INTEGER not null)",
             'title.episode.tsv.gz'
             ),
         "ratings" : (
-            e2,
+            None,
             "RatingsDB",
             "CREATE TABLE RatingsDB(TitleID TEXT unique not null, AccountID TEXT, Rating REAL, Review TEXT)",
             'title.ratings.tsv.gz'
             ),
         "basics" : (
-            e3,
+            None,
             "TelevisionDB",
             "CREATE TABLE TelevisionDB(TitleID TEXT unique not null, TitleName TEXT not null, TitleType TEXT not null, StartYear TEXT, EndYear TEXT, Genre TEXT)",
             'title.basics.tsv.gz'
             ),
         "crew" : (
-            e4,
+            None,
             "CrewDB",
             "CREATE TABLE CrewDB(TitleID TEXT unique not null, DirectorID TEXT)",
             'title.crew.tsv.gz'
             ),
         "people" : (
-            e5,
+            None,
             "PeopleDB",
             "CREATE TABLE PeopleDB(PersonID TEXT unique not null, Name Text not null, Professions TEXT, WorkedIn TEXT)",
             'name.basics.tsv.gz'
@@ -76,11 +59,12 @@ def loadDB():
 
     insert= {
         "basics": lambda cur, line : 
-            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8])),
+            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8]))
+            if line[1] != 'short' and line[1] != 'tvEpisode' else 0,
         "episodes": lambda cur, line : 
             cur.execute("INSERT INTO EpisodeDB VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
         "ratings": lambda cur, line :
-            cur.execute("INSERT INTO RatingsDB(TitleID,Rating) VALUES(?,?,?);",(line[0], "N/A",float(line[1])),"N/A"),
+            cur.execute("INSERT INTO RatingsDB(TitleID, AccountID, Rating, Review) VALUES(?,?,?,?);",(line[0], "N/A",float(line[1]),"N/A")),
         "crew": lambda cur, line :
             cur.execute("INSERT INTO CrewDB(TitleID, DirectorID) VALUES(?,?);", (line[0], line[1])),
         "people": lambda cur, line :
@@ -88,18 +72,27 @@ def loadDB():
         }
 
 
-    for key in queryDict:
-        dbfunctions.createTable(*queryDict[key])
-        dbfunctions.loadTable(queryDict[key][0], key, queryDict[key][3], insert)
+    t1=threading.Thread(target=initTables, args=(conn, queryDict, "episodes", insert))
+    t2=threading.Thread(target=initTables, args=(conn, queryDict, "ratings", insert))
+    t3=threading.Thread(target=initTables, args=(conn, queryDict, "basics", insert))
+    t4=threading.Thread(target=initTables, args=(conn, queryDict, "crew", insert))
+    t5=threading.Thread(target=initTables, args=(conn, queryDict, "people", insert))
 
+    threads = [t1, t2, t3, t4, t5]
+    
+    for t in threads:
+        t.start()
+    
     for t in threads:
         t.join()
 
-    dbfunctions.cleanEpisodeDB()
-
-
     print(time.time() - start)
     return
+
+def initTables(conn, queryDict, key, insert):
+
+    dbfunctions.createTable(conn, *queryDict[key])
+    dbfunctions.loadTable(conn, queryDict[key][0], key, queryDict[key][3], insert)
 
 def downloadFile(fileURL,fileName,eventName):
     """
@@ -118,5 +111,6 @@ def downloadFile(fileURL,fileName,eventName):
         print ("{:s} not found".format(fileURL))
         return 404
 
-
-loadDB()
+conn = dbfunctions.dbConnect()
+loadDB(conn)
+dbfunctions.dbClose(conn)

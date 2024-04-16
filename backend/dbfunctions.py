@@ -3,6 +3,22 @@ import unicodecsv
 import os
 import sqlite3
 
+
+def dbConnect():
+    try:
+        conn=sqlite3.connect('television.db', check_same_thread=False)
+        return conn
+    except Exception as e:
+        print(e)
+
+def dbClose(conn):
+    try:
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(e)
+
+
 def dbExists():
     """
     function that checks to see if the television.db file exists in the current working directory
@@ -13,13 +29,12 @@ def dbExists():
         return True
     return False
 
-def createTable(eventName, dropIfExists, create, tableFile = "N/A"):
+def createTable(conn, eventName, dropIfExists, create, tableFile = "N/A"):
     if (eventName != None):
         eventName.wait()
     try:
-        conn=sqlite3.connect('television.db')
-        cur = conn.cursor()
-        print("connection established -- creating table: "+dropIfExists)
+        cur=conn.cursor()
+        print("-- creating table: "+dropIfExists)
         cur.execute("DROP TABLE IF EXISTS "+dropIfExists)
         cur.execute(create)
     except IOError:
@@ -27,14 +42,13 @@ def createTable(eventName, dropIfExists, create, tableFile = "N/A"):
             return -1
     return 0
 
-def loadTable(eventName, table, tableFile, queries):
+def loadTable(conn, eventName, table, tableFile, queries):
 
     if (eventName != None):
         eventName.wait()
-    conn=sqlite3.connect('television.db')
-    cur = conn.cursor()
-    print("connection established -- loading: "+table)
+    print("-- loading: "+table)
     try:
+        cur=conn.cursor()
         with gzip.open(tableFile, 'rb') as infile:
             reader=unicodecsv.reader(infile,delimiter="\t")
             for line in reader:
@@ -43,7 +57,6 @@ def loadTable(eventName, table, tableFile, queries):
                 except:
                     pass
         conn.commit()
-        conn.close()
     except IOError:
         print("Error loading: "+tableFile)
         return -1
@@ -57,7 +70,7 @@ def cleanEpisodeDB():
     command="delete from EpisodeDB where titleID not in (select distinct titleID from RatingsDB)"
     SQLConn("television.db",command)
 
-def SQLConn(database, command):
+def SQLConn(conn, database, command):
     """
     Function to make SQl connection to database and perform passed command.  Opens connection, executes command,
     commits and closes connection.
@@ -65,11 +78,9 @@ def SQLConn(database, command):
     :param command: sql command to execute
     :return: result of SQL command
     """
-    conn=sqlite3.connect(database)
     cur=conn.cursor()
     cur.execute(command)
     result=cur.fetchall()
     #print(result)
     conn.commit()
-    conn.close()
     return result
