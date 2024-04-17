@@ -60,14 +60,6 @@ def search_crew(crew: str):
     except Exception as e:
         raise HTTPException(status_code=404, detail="Cannot search by crew")
         
-
-#reviews
-''' Create, read, update, delete 
-@app.post("/review/create)
-
-@app.get("/review/{id})
-'''
-
 #users
 @app.post("/login")
 async def login(request:Request):

@@ -35,6 +35,7 @@ def createTable(conn, eventName, tableName, create, tableFile = "N/A"):
     try:
         cur=conn.cursor()
         print("-- creating table: "+tableName)
+        dropTable(conn, None, tableName)
         cur.execute(create)
     except IOError:
             print("Error creating: "+tableName)

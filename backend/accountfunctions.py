@@ -7,8 +7,6 @@ def createAccount(conn, username, password):
     hashed_password = encrypt(password, salt)
     command = "INSERT INTO AccountsDB(Username, HashPassword, Salt) VALUES ('"+username+"', '"+hashed_password+"', '"+salt+"');"
 
-    print(command)
-
     return dbfunctions.SQLConn(conn, "television.db", command)
 
 def searchAccountID(conn, username):
@@ -21,7 +19,6 @@ def verifyLogin(conn, username, password):
     result = dbfunctions.SQLConn(conn, "television.db", command)
 
     if(result is not None):
-        print(result)
         database_password = result[0][0]
         salt = result[0][1]
         hashed_password = encrypt(password, salt) #add in the salt from the database to compare
@@ -31,9 +28,14 @@ def verifyLogin(conn, username, password):
     return False
 
 def getReviews(conn, accountID):
-    command = "SELECT Rating, Review FROM RatingsDB WHERE AccountID = " \
-        "(SELECT AccountID FROM AccountsDB WHERE AccountID = '"+accountID+"');"
+    command = "SELECT Rating, Review FROM UserRatingsDB WHERE AccountID = '"+accountID+"';"
     
+    return(dbfunctions.SQLConn(conn, "television.db", command))
+
+def createReviews(conn, titleID, accountID, rating, review):
+    command = "INSERT INTO UserRatingsDB(TitleID, AccountID, Rating, Review) VALUES ('"+titleID+"', '"+accountID+"', '"+rating+"', '"+review+"');"
+    #add call to ratingsdb to update too
+
     return(dbfunctions.SQLConn(conn, "television.db", command))
         
 def generate_salt():

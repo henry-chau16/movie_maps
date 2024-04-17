@@ -1,6 +1,5 @@
 import dbfunctions
 
-
 def accountinit(conn):
     tables = {
         "accounts" : (
@@ -11,7 +10,12 @@ def accountinit(conn):
         "logins" : (
                 None,
                 "LoginsDB",
-                "CREATE TABLE IF NOT EXISTS LoginsDB(LoginID INTEGER PRIMARY KEY unique not null, AccountID TEXT not null)"
+                "CREATE TABLE IF NOT EXISTS LoginsDB(LoginID INTEGER PRIMARY KEY unique not null, AccountID INTEGER not null)"
+            ),
+        "userRatings": (
+                None,
+                "UserRatingsDB",
+                "CREATE TABLE IF NOT EXISTS UserRatingsDB(RatingID INTEGER PRIMARY KEY unique not null, AccountID INTEGER not null, TitleID TEXT not null, Rating REAL not null, Review TEXT)"
             )
         }
     try:

@@ -28,13 +28,13 @@ def loadDB(conn):
         "episodes" : (
             None,
             "EpisodeDB",
-            "CREATE TABLE IF NOT EXISTS EpisodeDB(TitleID TEXT not null,ParentID TEXT not null, SeasonNum INTEGER not null, EpisodeNum INTEGER not null)",
+            "CREATE TABLE IF NOT EXISTS EpisodeDB(EpisodeID TEXT PRIMARY KEY unique not null, ParentID TEXT not null, SeasonNum INTEGER not null, EpisodeNum INTEGER not null)",
             'title.episode.tsv.gz'
             ),
         "ratings" : (
             None,
             "RatingsDB",
-            "CREATE TABLE IF NOT EXISTS RatingsDB(TitleID TEXT unique not null, AccountID TEXT, Rating REAL, Review TEXT)",
+            "CREATE TABLE IF NOT EXISTS RatingsDB(TitleID TEXT unique not null, Rating REAL, NumVotes INTEGER not null)",
             'title.ratings.tsv.gz'
             ),
         "basics" : (
@@ -50,9 +50,9 @@ def loadDB(conn):
             cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8]))
             if line[1] == 'movie' or line[1] == 'tvSeries' else 0,
         "episodes": lambda cur, line : 
-            cur.execute("INSERT INTO EpisodeDB VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
+            cur.execute("INSERT INTO EpisodeDB(EpisodeID, ParentID, SeasonNum, EpisodeNum) VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
         "ratings": lambda cur, line :
-            cur.execute("INSERT INTO RatingsDB(TitleID, AccountID, Rating, Review) VALUES(?,?,?,?);",(line[0], "NULL",float(line[1]),"NULL"))
+            cur.execute("INSERT INTO RatingsDB(TitleID, Rating, NumVotes) VALUES(?,?,?);",(line[0],float(line[1]), line[2]))
         }
 
 
