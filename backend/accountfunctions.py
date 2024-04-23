@@ -27,17 +27,21 @@ def verifyLogin(conn, username, password):
             return True
     return False
 
-def getReviews(conn, accountID):
+def getUserReviews(conn, accountID):
     command = "SELECT Rating, Review FROM UserRatingsDB WHERE AccountID = '"+accountID+"';"
     
     return(dbfunctions.SQLConn(conn, "television.db", command))
 
 def createReviews(conn, titleID, accountID, rating, review):
     command = "INSERT INTO UserRatingsDB(TitleID, AccountID, Rating, Review) VALUES ('"+titleID+"', '"+accountID+"', '"+rating+"', '"+review+"');"
-    #add call to ratingsdb to update too
-
+    imdb_update = "UPDATE RatingsDB SET Rating = (Rating * NumVotes + "+rating+") / (NumVotes + 1), NumVotes = NumVotes + 1 WHERE TitleID = '"+titleID+"';"
+    dbfunctions.SQLConn(conn, "television.db", imdb_update)
     return(dbfunctions.SQLConn(conn, "television.db", command))
-        
+
+def fetchReviews(conn, titleID):
+    command = "SELECT Username, Rating, Review FROM UserRatingsDB u INNER JOIN AccountsDB a ON u.AccountID = a.AccountID WHERE TitleID = '" + titleID + "';"
+    return dbfunctions.SQLConn(conn, "television.db", command)
+
 def generate_salt():
     return os.urandom(16).hex()
 
@@ -48,4 +52,19 @@ def encrypt(password, salt):
 
     return hash_object.hexdigest()
 
+
+
+#test
 conn = dbfunctions.dbConnect()
+#account creation
+'''
+createAccount(conn, "User", "Pass")
+print(verifyLogin(conn, "User", "Pass"))
+
+userID = searchAccountID(conn, "User")
+
+#reviews
+createReviews(conn, "tt0000630", str(userID[0][0]), str(7.5), "mid") 
+print(getUserReviews(conn, str(userID[0][0])))
+print(fetchReviews(conn, "tt0000630"))
+'''

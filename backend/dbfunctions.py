@@ -88,6 +88,7 @@ def updateRow(conn, table, updateField, updateValue, field, value):
     input = "UPDATE "+table+" SET "+updateField+" = "+updateValue+ " WHERE "+field+" = "+value+";"
     return sqlDML(conn, input)
 
+
 def cleanEpisodeDB():
     """
     function to delete all records in the episode DB which do not have associated ratings data

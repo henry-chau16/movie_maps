@@ -7,11 +7,6 @@ def accountinit(conn):
                 "AccountsDB",
                 "CREATE TABLE IF NOT EXISTS AccountsDB(AccountID INTEGER PRIMARY KEY unique not null, Username TEXT unique not null, HashPassword TEXT unique not null, Salt TEXT not null)",
                 ),
-        "logins" : (
-                None,
-                "LoginsDB",
-                "CREATE TABLE IF NOT EXISTS LoginsDB(LoginID INTEGER PRIMARY KEY unique not null, AccountID INTEGER not null)"
-            ),
         "userRatings": (
                 None,
                 "UserRatingsDB",
