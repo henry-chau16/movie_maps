@@ -1,9 +1,8 @@
 //Context not needed here, use it for authentication instead
 
     const backendUrl = 'http://localhost:8000'
-    //Too much data currently. Try to filter out the movies or just episodes if not possible
-    /*
-    const displayTitles = async() => { 
+
+    export async function displayTitles(searchTitle) {
         try { 
             const response = await fetch(backendUrl + '/filter/years?startYr=2024');
             const data = await response.json();
@@ -11,7 +10,7 @@
         } catch (error) {
           console.error('There was a problem with the fetch operation:', error);
         }
-    } */
+    } 
 
     export async function searchByTitle(searchTitle) { 
         try { 

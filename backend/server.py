@@ -68,7 +68,7 @@ async def login(request:Request):
     password = data.get("password")
 
     try:
-        if (accountfunctions.verifyLogin(username, password)):
+        if (accountfunctions.verifyLogin(conn, username, password)):
             return {"message": "Login successful"}
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials.")
@@ -82,11 +82,34 @@ async def register(request:Request):
     password = data.get("password")
     
     try:
-        accountfunctions.createAccount(username, password)
+        accountfunctions.createAccount(conn, username, password)
     except:
         raise HTTPException(status_code=500, detail="Cannot create the user.")
-    
+
+#reviews
+
+@app.post("/create/review/{accID}")
+def createReview(accID: str, titleID: str = Query(...), rating: float = Query(...), review: str = Query(...)):
+    try:
+        return accountfunctions.createReviews(conn, titleID, accID, str(rating), review)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Unable to add review.")
+
+@app.get("/fetch/review/{field}")
+def listReviews(field: str, id: str = Query(...)):
+    try:
+        if(field == "title"):
+            return accountfunctions.fetchReviews(conn, id)
+        elif(field == "account"):
+            return accountfunctions.getUserReviews(conn, id)
+        else:
+            raise HTTPException(status_code=404, detail="page not found")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Unable to fetch reviews.")
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="localhost", port=8000)
-    dbfunctions.dbClose(conn)
+    if (dbfunctions.dbExists()): 
+        uvicorn.run("server:app", host="localhost", port=8000)
+        dbfunctions.dbClose(conn)
+    else:
+        print("Run accountsinit and dbinit first.")
