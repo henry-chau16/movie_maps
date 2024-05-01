@@ -42,6 +42,16 @@ def createTable(conn, eventName, tableName, create, tableFile = "N/A"):
             return -1
     return 0
 
+def createIndex(conn, tableName, columns, indexName):
+    try:
+        cur=conn.cursor()
+        print("-- creating index for table: "+tableName)
+        command = "CREATE INDEX "+indexName+" ON "+tableName+"("+columns+");"
+        cur.execute(command)
+    except IOError:
+            print("Error creating index for: "+tableName)
+            return -1
+    return 0
 def loadTable(conn, eventName, table, tableFile, queries):
 
     if (eventName != None):
@@ -88,14 +98,26 @@ def updateRow(conn, table, updateField, updateValue, field, value):
     input = "UPDATE "+table+" SET "+updateField+" = "+updateValue+ " WHERE "+field+" = "+value+";"
     return sqlDML(conn, input)
 
+def createTrigger(conn, triggerName, occurrence, dmlOperation, tableName, statement): 
+    input = "CREATE TRIGGER "+triggerName+ " "+occurrence+" "+dmlOperation + " ON " + tableName + " " +statement+";"
+    print(input)
+    return sqlDML(conn, input)
 
-def cleanEpisodeDB():
+def cleanEpisodeDB(conn):
     """
     function to delete all records in the episode DB which do not have associated ratings data
     :return:
     """
-    command="delete from EpisodeDB where titleID not in (select distinct titleID from RatingsDB)"
-    SQLConn("television.db",command)
+    command="DELETE FROM EpisodeDB WHERE titleID NOT IN (SELECT DISTINCT titleID FROM RatingsDB);"
+    SQLConn(conn, "television.db",command)
+
+def cleanRatingsDB(conn):
+    """
+    function to delete all rows in RatingsDB which do not have associated data in TelevisionDB
+    :return:
+    """
+    command = "DELETE FROM RatingsDB WHERE titleID NOT IN (SELECT DISTINCT titleID FROM TelevisionDB);"
+    SQLConn(conn, "television.db", command)
 
 def sqlDML(conn, input):
     try:

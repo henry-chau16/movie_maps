@@ -34,8 +34,6 @@ def getUserReviews(conn, accountID):
 
 def createReviews(conn, titleID, accountID, rating, review):
     command = "INSERT INTO UserRatingsDB(TitleID, AccountID, Rating, Review) VALUES ('"+titleID+"', '"+accountID+"', '"+rating+"', '"+review+"');"
-    imdb_update = "UPDATE RatingsDB SET Rating = (Rating * NumVotes + "+rating+") / (NumVotes + 1), NumVotes = NumVotes + 1 WHERE TitleID = '"+titleID+"';"
-    dbfunctions.SQLConn(conn, "television.db", imdb_update)
     return(dbfunctions.SQLConn(conn, "television.db", command))
 
 def fetchReviews(conn, titleID):
@@ -57,14 +55,14 @@ def encrypt(password, salt):
 #test
 conn = dbfunctions.dbConnect()
 #account creation
-'''
+
 createAccount(conn, "User", "Pass")
 print(verifyLogin(conn, "User", "Pass"))
+
 
 userID = searchAccountID(conn, "User")
 
 #reviews
-createReviews(conn, "tt0000630", str(userID[0][0]), str(7.5), "mid") 
+createReviews(conn, "tt0002591", str(userID[0][0]), str(10), "slaps") 
 print(getUserReviews(conn, str(userID[0][0])))
-print(fetchReviews(conn, "tt0000630"))
-'''
+print(fetchReviews(conn, "tt0002591"))

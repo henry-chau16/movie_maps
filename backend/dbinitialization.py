@@ -25,23 +25,23 @@ def loadDB(conn):
     start=time.time()
 
     queryDict = {
+        "basics" : (
+            None,
+            "TelevisionDB",
+            "CREATE TABLE IF NOT EXISTS TelevisionDB(TitleID TEXT PRIMARY KEY unique not null, TitleName TEXT not null, TitleType TEXT not null, StartYear TEXT, EndYear TEXT, Genre TEXT) WITHOUT ROWID",
+            'title.basics.tsv.gz'
+            ),
         "episodes" : (
             None,
-            "EpisodeDB",
-            "CREATE TABLE IF NOT EXISTS EpisodeDB(EpisodeID TEXT PRIMARY KEY unique not null, ParentID TEXT not null, SeasonNum INTEGER not null, EpisodeNum INTEGER not null)",
+            "EpisodeDB",                                                                                                                                                                                                #clustered indexing
+            "CREATE TABLE IF NOT EXISTS EpisodeDB(EpisodeID TEXT PRIMARY KEY unique not null, ParentID TEXT not null, SeasonNum INTEGER not null, EpisodeNum INTEGER not null, FOREIGN KEY (ParentID) REFERENCES basics(TitleID)) WITHOUT ROWID",
             'title.episode.tsv.gz'
             ),
         "ratings" : (
             None,
             "RatingsDB",
-            "CREATE TABLE IF NOT EXISTS RatingsDB(TitleID TEXT unique not null, Rating REAL, NumVotes INTEGER not null)",
+            "CREATE TABLE IF NOT EXISTS RatingsDB(TitleID TEXT PRIMARY KEY unique not null, Rating REAL, NumVotes INTEGER not null, FOREIGN KEY (TitleID) REFERENCES ratings(TitleID)) WITHOUT ROWID",
             'title.ratings.tsv.gz'
-            ),
-        "basics" : (
-            None,
-            "TelevisionDB",
-            "CREATE TABLE IF NOT EXISTS TelevisionDB(TitleID TEXT unique not null, TitleName TEXT not null, TitleType TEXT not null, StartYear TEXT, EndYear TEXT, Genre TEXT)",
-            'title.basics.tsv.gz'
             )
     }
 
@@ -68,6 +68,8 @@ def loadDB(conn):
     for t in threads:
         t.join()
 
+    dbfunctions.cleanRatingsDB(conn)
+
     print(time.time() - start)
     return
 
@@ -75,6 +77,7 @@ def initTables(conn, queryDict, key, insert):
 
     dbfunctions.createTable(conn, *queryDict[key])
     dbfunctions.loadTable(conn, queryDict[key][0], key, queryDict[key][3], insert)
+
 
 def downloadFile(fileURL,fileName,eventName):
     """
