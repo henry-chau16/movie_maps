@@ -3,7 +3,8 @@ import './App.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import TitleInfo from './pages/TitlePage'; 
+import MoviePage from './pages/MoviePage'; 
+import SeriesPage from './pages/SeriesPage'; 
 import ReviewPage from './pages/ReviewPage';
 import React from 'react'; 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -16,7 +17,8 @@ function App() {
           <Route path = "/" element = {<Home/>}></Route>
           <Route path = "/login" element = {<Login/>}></Route>
           <Route path = "/register" element = {<Register/>}></Route>
-          <Route path = "/title/:titleId" element = {<TitleInfo/>}></Route> 
+          <Route path = "/movie/:titleId" element = {<MoviePage/>}></Route> 
+          <Route path = "/series/:titleId" element = {<SeriesPage/>}></Route>
           <Route path = "/review" element = {<ReviewPage/>}></Route> {/*Make dynamic later. */}
         </Routes>
       </BrowserRouter>

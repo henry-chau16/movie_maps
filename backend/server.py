@@ -29,21 +29,23 @@ def get_title(id: str):
         return search_filter.enterTitle(conn, id)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Cannot find the title")
+
 #filter
-@app.get("/filter/genre/{genre}")
-def filter_genre(genre: str):
+@app.get("/filter/search")
+def filter_search(genre: str = "n", startYr: str = "n", endYr: str = "n", titleType: str = "n"):
     try:
-        return search_filter.filterGenre(conn, genre)
+        return search_filter.filter(conn, genre, startYr, endYr, titleType)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Cannot filter by genre")
 
-@app.get("/filter/years")
-def filter_years(startYr: str = Query(...), endYr: str = "n"):
+#filter reset
+@app.get("/filter/reset")
+def reset_filter():
     try:
-        return search_filter.filterYears(conn, startYr, endYr)
+        return search_filter.clearFilters(conn)
     except Exception as e:
-        raise HTTPException(status_code=404, detail="Cannot filter by years")
-    
+        raise HTTPException(status_code=404, detail="Cannot filter by genre")
+
 #search
 @app.get("/search/title/{title}")
 def search_title(title: str):
@@ -53,12 +55,26 @@ def search_title(title: str):
     except Exception as e:
         raise HTTPException(status_code=404, detail="Cannot search by title") 
 
-@app.get("/search/crew/{crew}")
-def search_crew(crew: str):
+@app.get("/select/years")
+def select_years(startYr: str = Query(...), endYr: str = "n"):
     try:
-        return search_filter.searchCrew(conn, crew)
+        return search_filter.selectYears(conn, startYr, endYr)
     except Exception as e:
-        raise HTTPException(status_code=404, detail="Cannot search by crew")
+        raise HTTPException(status_code=404, detail="Cannot filter by years")
+
+@app.get("/search/ratings/{id}")
+def search_ratings(id: str):
+    try:
+        return search_filter.searchRating(conn, id)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Cannot filter by years")
+
+@app.get("/fetch/episodes/{id}")
+def fetch_episodes(id: str):
+    try:
+        return (search_filter.listEpisodes(conn, id))
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Cannot filter by years")
         
 #users
 @app.post("/login")
@@ -69,11 +85,12 @@ async def login(request:Request):
 
     try:
         if (accountfunctions.verifyLogin(conn, username, password)):
-            return {"message": "Login successful"}
+            user_id = accountfunctions.searchAccountID(conn, username)[0][0]
+            return {"message": "Login successful", "user_id": user_id}
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials.")
     except:
-        raise HTTPException(status_code=500, detail="Unable to register.")
+        raise HTTPException(status_code=500, detail="Unable to login.")
 
 @app.post("/register", status_code = 201)
 async def register(request:Request):
@@ -89,7 +106,12 @@ async def register(request:Request):
 #reviews
 
 @app.post("/create/review/{accID}")
-def createReview(accID: str, titleID: str = Query(...), rating: float = Query(...), review: str = Query(...)):
+async def createReview(accID: str, request:Request):
+    data = await request.json()
+    titleID = data.get("titleID")
+    rating = data.get("rating")
+    review = data.get("review")
+
     try:
         return accountfunctions.createReviews(conn, titleID, accID, str(rating), review)
     except Exception as e:
@@ -106,6 +128,20 @@ def listReviews(field: str, id: str = Query(...)):
             raise HTTPException(status_code=404, detail="page not found")
     except Exception as e:
         raise HTTPException(status_code=400, detail="Unable to fetch reviews.")
+
+@app.put("/update/review/{ratingID}")
+def updateReview(ratingID: int, rating: int = Query(...), review: str = Query(...)):
+    try:
+        return accountfunctions.updateReview(conn, ratingID, rating, review)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Unable to update reviews.")
+
+@app.delete("/delete/review/{ratingID}")
+def deleteReview(ratingID: int):
+    try:
+        return accountfunctions.deleteReview(conn, ratingID)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Unable to delete reviews.")
 
 if __name__ == "__main__":
     if (dbfunctions.dbExists()): 

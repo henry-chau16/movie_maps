@@ -28,7 +28,7 @@ def loadDB(conn):
         "basics" : (
             None,
             "TelevisionDB",
-            "CREATE TABLE IF NOT EXISTS TelevisionDB(TitleID TEXT PRIMARY KEY unique not null, TitleName TEXT not null, TitleType TEXT not null, StartYear TEXT, EndYear TEXT, Genre TEXT) WITHOUT ROWID",
+            "CREATE TABLE IF NOT EXISTS TelevisionDB(TitleID TEXT PRIMARY KEY unique not null, TitleName TEXT not null, TitleType TEXT not null, StartYear INTEGER, EndYear INTEGER, Genre TEXT) WITHOUT ROWID",
             'title.basics.tsv.gz'
             ),
         "episodes" : (
@@ -47,8 +47,10 @@ def loadDB(conn):
 
     insert= {
         "basics": lambda cur, line : 
-            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8]))
-            if line[1] == 'movie' or line[1] == 'tvSeries' else 0,
+            cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],"NULL",line[8]))
+            if line[6] == "\\N" and (line[1] == 'movie' or line[1] == 'tvSeries') 
+            else cur.execute("INSERT INTO TelevisionDB(TitleID,TitleName,TitleType,StartYear,EndYear,Genre) VALUES (?,?,?,?,?,?);",(line[0],line[2],line[1],line[5],line[6],line[8]))
+            if line[6] != "\\N" and (line[1] == 'movie' or line[1] == 'tvSeries') else 0,
         "episodes": lambda cur, line : 
             cur.execute("INSERT INTO EpisodeDB(EpisodeID, ParentID, SeasonNum, EpisodeNum) VALUES (?,?,?,?);",(line[0],line[1],line[2],line[3])) if line[2].isdigit() else 0,
         "ratings": lambda cur, line :
@@ -69,6 +71,7 @@ def loadDB(conn):
         t.join()
 
     dbfunctions.cleanRatingsDB(conn)
+    dbfunctions.SQLConn(conn, "television.db", "Create view Filters as Select * from TelevisionDB;")
 
     print(time.time() - start)
     return

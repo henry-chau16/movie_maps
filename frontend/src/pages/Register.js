@@ -1,10 +1,11 @@
 import Navigation from "../components/Navigation"
 import {register} from "../api/Account"
 
-export default function Register() { 
+export default function Register() {  
     async function registerUser(event) { 
         event.preventDefault(); //prevents refresh on submit
 
+        //@TODO: Add data validation later for password.
         const formData = new FormData(event.target)
         const username = formData.get("username")
         const password = formData.get("password")

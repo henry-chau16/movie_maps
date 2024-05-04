@@ -42,16 +42,6 @@ def createTable(conn, eventName, tableName, create, tableFile = "N/A"):
             return -1
     return 0
 
-def createIndex(conn, tableName, columns, indexName):
-    try:
-        cur=conn.cursor()
-        print("-- creating index for table: "+tableName)
-        command = "CREATE INDEX "+indexName+" ON "+tableName+"("+columns+");"
-        cur.execute(command)
-    except IOError:
-            print("Error creating index for: "+tableName)
-            return -1
-    return 0
 def loadTable(conn, eventName, table, tableFile, queries):
 
     if (eventName != None):
@@ -100,7 +90,6 @@ def updateRow(conn, table, updateField, updateValue, field, value):
 
 def createTrigger(conn, triggerName, occurrence, dmlOperation, tableName, statement): 
     input = "CREATE TRIGGER "+triggerName+ " "+occurrence+" "+dmlOperation + " ON " + tableName + " " +statement+";"
-    print(input)
     return sqlDML(conn, input)
 
 def cleanEpisodeDB(conn):
