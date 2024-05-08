@@ -58,37 +58,13 @@ def selectYears(conn, startYr, endYr):
     print(startYr, endYr)
     if (endYr != "n"):
         command = "Select * " \
-            "from TelevisionDB t " \
+            "from Filters " \
             "where startYear = {sY} and endYear = {eY} order by titleName".format(sY = startYr, eY = endYr)
     else:
         command = "Select * " \
-            "from TelevisionDB t " \
+            "from Filters " \
             "where startYear = {sY} order by titleName LIMIT 50".format(sY = startYr)
     print(command)
-    return SQLConn(conn, "television.db", command)
-
-def filterYears(conn, startYr, endYr):
-
-    print(startYr, endYr)
-    if (startYr != "n" and endYr != "n"):
-        command = "Select titleID, titleName,startYear,endYear, genre " \
-            "from TelevisionDB t " \
-            "where startYear between {sY} and {eY} order by titleName".format(sY = startYr, eY = endYr)
-    elif (startYr != "n" and endYr == "n"):
-        command = "Select titleID, titleName,startYear,endYear, genre " \
-            "from TelevisionDB t " \
-            "where startYear >= {sY} order by titleName LIMIT 50".format(sY = startYr)
-    elif (startYr == "n" and endYr != "n"):
-        command = "Select titleID, titleName,startYear,endYear, genre " \
-            "from TelevisionDB t " \
-            "where startYear <= {eY} order by titleName LIMIT 50".format(eY = endYr)
-    else:
-        command = "Select titleID, titleName,startYear,endYear, genre " \
-            "from TelevisionDB t " \
-            "order by titleName LIMIT 50"
-
-    command = "Create view Filters as " + command
-        
     return SQLConn(conn, "television.db", command)
 
 def searchTitle(conn, searchValue):

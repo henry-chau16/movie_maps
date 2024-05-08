@@ -14,7 +14,14 @@ def accountinit(conn):
             )
         }
     triggers = { 
-        "insertRatings" : (
+        "enterNewRatings" : (
+            "enterNewRatingsTrigger",
+            "AFTER",
+            "INSERT",
+            "UserRatingsDB",
+            "WHEN NOT EXISTS (SELECT * FROM RatingsDB WHERE TitleID = NEW.TitleID) BEGIN INSERT INTO RatingsDB(TitleID, Rating, NumVotes) VALUES(NEW.TitleID, NEW.Rating, 1); END"
+        ),
+        "insertRatings": (
             "InsertRatingsTrigger",
             "AFTER",
             "INSERT",

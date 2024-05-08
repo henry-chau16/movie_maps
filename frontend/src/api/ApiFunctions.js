@@ -96,9 +96,10 @@ export async function listEpisodes(id) {
 }
 
 //set filters for search
-export async function filter(genre, start, end, type) {
+export async function filter(genre = "n", start = "n", end = "n", type = "n") {
+    console.log(backendUrl + `/filter/search?genre=${genre}&startYr=${start}&endYr=${end}&titleType=${type}`)
     try { 
-        const response = await fetch(backendUrl + `/filter?genre=${genre}&startYr=${start}&endYr=${end}&titleType=${type}`);
+        const response = await fetch(backendUrl + `/filter/search?genre=${genre}&startYr=${start}&endYr=${end}&titleType=${type}`);
         const data = await response.json();
         if (response.ok) {
             return data; 
@@ -108,6 +109,21 @@ export async function filter(genre, start, end, type) {
         } 
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
-    }
+    } 
 }
 
+//clear filters
+export async function clearFilter() {
+    try { 
+        const response = await fetch(backendUrl + '/filter/reset');
+        const data = await response.json();
+        if (response.ok) {
+            return data; 
+        }
+        else{
+            throw new Error("Failed to remove filter")
+        } 
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+}

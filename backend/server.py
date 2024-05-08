@@ -105,6 +105,7 @@ async def register(request:Request):
 
 #reviews
 
+#remove the id in url later
 @app.post("/create/review/{accID}")
 async def createReview(accID: str, request:Request):
     data = await request.json()

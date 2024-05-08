@@ -16,7 +16,6 @@ export default function Home() {
        setLoading(true);
        const fetchData = async () => { 
         const apiResponse = await displayTitles();
-        console.log(apiResponse)
         setTitles(apiResponse)
         setLoading(false);
        }
@@ -57,6 +56,7 @@ export default function Home() {
             </div>
         )}
              {openFilter && <Filter/>}
+        <button><Link to = {"/review"}>My Reviews</Link></button>
         </div>
     )
 }
