@@ -11,7 +11,7 @@ export default function Home() {
     const[loading, setLoading] = useState(false);
 
     const [titles, setTitles] = useState([]);
-    const [userId, setUserId] = useState("");
+    const [userId, setUserId] = useState(null);
     const [btnLink, setbtnLink] = useState("/login");
 
     useEffect(() => { //replace with call to api once results limited
@@ -26,8 +26,10 @@ export default function Home() {
 
     useEffect(() => {
         setUserId(sessionStorage.getItem("user_id"))
-        if(userId != ""){
+        if(userId != null){
             setbtnLink("/review")
+        } else { 
+            setbtnLink("/login")
         }
     }, [userId]);
 
