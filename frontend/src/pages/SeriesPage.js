@@ -28,8 +28,9 @@ return (
         {loading ? (<p>Loading..</p>) : (
         <div>
             {episodes && episodes.map((item) => (
-                <h3 style = {{textAlign : 'Center'}} > Episode {item[0]} : Season {item[1]}
-                </h3>
+                <Link key= {item[0]} to={`/episode?parentId=${titleId}&episodeId=${item[0]}&episodeNum=${item[1]}&season=${item[2]}`}>
+                <button>Episode: {item[1]} - Season: {item[2]}</button>
+                </Link>
             ))}
         </div>
     )}

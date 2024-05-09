@@ -40,7 +40,14 @@ def accountinit(conn):
             "AFTER",
             "DELETE",
             "UserRatingsDB",
-            "BEGIN UPDATE RatingsDB SET Rating = (Rating * NumVotes - OLD.Rating) / (NumVotes - 1), NumVotes = NumVotes - 1 WHERE TitleID = OLD.TitleID; END"
+            "WHEN (SELECT NumVotes FROM RatingsDB WHERE TitleID = OLD.TitleID) > 1 BEGIN UPDATE RatingsDB SET Rating = (Rating * NumVotes - OLD.Rating) / (NumVotes - 1), NumVotes = NumVotes - 1 WHERE TitleID = OLD.TitleID; END"
+        ),
+        "deleteLastRating" :(
+            "DeleteLastRatingTrigger",
+            "AFTER",
+            "DELETE",
+            "UserRatingsDB",
+            "WHEN (SELECT NumVotes FROM RatingsDB WHERE TitleID = OLD.TitleID) = 1 BEGIN UPDATE RatingsDB SET Rating = 0, NumVotes = 0  WHERE TitleID = OLD.TitleID; END"
         )
     }
     try:

@@ -14,6 +14,10 @@ export default function Filter() {
         filter(genreString, startYear, endYear, type)
     }
 
+    function handleClearFilter() { 
+        clearFilter()
+    }
+
     function handleGenreChange (e) { 
         const genre = e.target.value; 
         if (e.target.checked) {
@@ -54,6 +58,7 @@ export default function Filter() {
                 />
             </ul>
             <button type = "submit">Filter</button>
+            <button onClick = {() => handleClearFilter()}>Clear Filter</button>
         </form>
         </div>
     )

@@ -30,8 +30,7 @@ def verifyLogin(conn, username, password):
     return False
 
 def getUserReviews(conn, accountID):
-    command = "SELECT TitleName, Rating, Review, StartYear, TitleType, Genre FROM UserRatingsDB u INNER JOIN TelevisionDB t ON u.TitleID = t.TitleID WHERE AccountID = "+str(accountID)+";"
-    
+    command = "SELECT TitleName, Rating, Review, StartYear, TitleType, Genre, RatingID FROM UserRatingsDB u INNER JOIN TelevisionDB t ON u.TitleID = t.TitleID WHERE AccountID = "+str(accountID)+";"
     return(dbfunctions.SQLConn(conn, "television.db", command))
 
 def createReviews(conn, titleID, accountID, rating, review):
@@ -43,11 +42,11 @@ def fetchReviews(conn, titleID):
     return dbfunctions.SQLConn(conn, "television.db", command)
 
 def updateReview(conn, ratingID, rating, review):
-    command = "UPDATE UserRatingsDB SET Rating = "+rating+", Review = '"+review+"' WHERE RatingID = "+ratingID+";"
+    command = "UPDATE UserRatingsDB SET Rating = "+str(rating)+", Review = '"+review+"' WHERE RatingID = "+str(ratingID)+";"
     return dbfunctions.SQLConn(conn, "television.db", command)
 
 def deleteReview(conn, ratingID):
-    command = "DELETE FROM UserRatingsDB WHERE RatingID = "+ratingID+";"
+    command = "DELETE FROM UserRatingsDB WHERE RatingID = "+str(ratingID)+";"
     return dbfunctions.SQLConn(conn, "television.db", command)
 
 def generate_salt():
@@ -63,11 +62,8 @@ def encrypt(password, salt):
 
 
 #test
-conn = dbfunctions.dbConnect()
-result = getUserReviews(conn, 1)
-print(result)
-dbfunctions.dbClose(conn)
 #account creations
+#conn = dbfunctions.dbConnect()
 
 #createAccount(conn, "User", "Pass")
 #verifyLogin(conn, "User", "Pass")
@@ -77,5 +73,8 @@ dbfunctions.dbClose(conn)
 #createReviews(conn, "tt0002591", str(userID[0][0]), str(10), "slaps") 
 #createReviews(conn, "tt0000009", str(userID[0][0]), str(10), "slaps") 
 #createReviews(conn, "tt29899777", str(userID[0][0]), str(10), "slaps") 
+#updateReview(conn, 1, 7, "Good")
 #print(getUserReviews(conn, str(userID[0][0])))
 #print(fetchReviews(conn, "tt29899777"))
+
+#dbfunctions.dbClose(conn)

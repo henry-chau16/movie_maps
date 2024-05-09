@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import MoviePage from './pages/MoviePage'; 
 import SeriesPage from './pages/SeriesPage'; 
 import ReviewPage from './pages/ReviewPage';
+import EpisodesPage from './pages/EpisodesPage';
 import React from 'react'; 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -19,7 +20,8 @@ function App() {
           <Route path = "/register" element = {<Register/>}></Route>
           <Route path = "/movie/:titleId" element = {<MoviePage/>}></Route> 
           <Route path = "/series/:titleId" element = {<SeriesPage/>}></Route>
-          <Route path = "/review" element = {<ReviewPage/>}></Route> {/*Make dynamic later. */}
+          <Route path = "/review" element = {<ReviewPage/>}></Route>
+          <Route path = "/episode" element = {<EpisodesPage/>}></Route> 
         </Routes>
       </BrowserRouter>
     </div>

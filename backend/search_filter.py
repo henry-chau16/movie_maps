@@ -89,7 +89,7 @@ def enterTitle(conn, titleID):
 
 def listEpisodes(conn, titleID):
     id = titleID.strip()
-    command = "Select EpisodeNum, SeasonNum FROM EpisodeDB where ParentID = '"+id+"' order by SeasonNum asc, EpisodeNum asc;"
+    command = "Select EpisodeID, EpisodeNum, SeasonNum FROM EpisodeDB where ParentID = '"+id+"' order by SeasonNum asc, EpisodeNum asc;"
     print(command)
     return SQLConn(conn, "television.db",command)
 

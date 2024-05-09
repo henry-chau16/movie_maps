@@ -11,6 +11,7 @@ export default function Home() {
     const[loading, setLoading] = useState(false);
 
     const [titles, setTitles] = useState([]);
+    const [userId, setUserId] = useState("");
 
     useEffect(() => { //replace with call to api once results limited
        setLoading(true);
@@ -18,6 +19,7 @@ export default function Home() {
         const apiResponse = await displayTitles();
         setTitles(apiResponse)
         setLoading(false);
+        setUserId(localStorage.getItem("user_id"))
        }
         fetchData(); 
     }, []); 

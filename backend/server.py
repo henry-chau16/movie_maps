@@ -131,7 +131,10 @@ def listReviews(field: str, id: str = Query(...)):
         raise HTTPException(status_code=400, detail="Unable to fetch reviews.")
 
 @app.put("/update/review/{ratingID}")
-def updateReview(ratingID: int, rating: int = Query(...), review: str = Query(...)):
+async def updateReview(ratingID: int, request:Request):
+    data = await request.json()
+    rating = data.get("rating")
+    review = data.get("review")
     try:
         return accountfunctions.updateReview(conn, ratingID, rating, review)
     except Exception as e:

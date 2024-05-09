@@ -43,7 +43,16 @@ export async function getReviews(field, id){
 
 export async function updateReviews(ratingID, rating, review){
   try{
-      const response = await fetch(backendUrl + `/update/review/${ratingID}?rating=${rating}&review=${review}`);
+      const response = await fetch(backendUrl + `/update/review/${ratingID}`, { 
+        method: 'PUT', 
+        headers: { 
+          'Content-type': 'application/json'
+        }, 
+        body: JSON.stringify({
+          rating: rating,
+          review: review
+        })
+      });
           const data = await response.json();
           if (response.ok) {
             return data; 
@@ -58,7 +67,9 @@ export async function updateReviews(ratingID, rating, review){
 
 export async function deleteReviews(ratingID){
   try{
-      const response = await fetch(backendUrl + `/delete/review/${ratingID}`);
+      const response = await fetch(backendUrl + `/delete/review/${ratingID}`, {
+        method: "DELETE"
+      });
           const data = await response.json();
           if (response.ok) {
             return data; 
