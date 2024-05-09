@@ -11,7 +11,8 @@ export default function Home() {
     const[loading, setLoading] = useState(false);
 
     const [titles, setTitles] = useState([]);
-    const [userId, setUserId] = useState("");
+    const [userId, setUserId] = useState(null);
+    const [btnLink, setbtnLink] = useState("/login");
 
     useEffect(() => { //replace with call to api once results limited
        setLoading(true);
@@ -19,10 +20,18 @@ export default function Home() {
         const apiResponse = await displayTitles();
         setTitles(apiResponse)
         setLoading(false);
-        setUserId(localStorage.getItem("user_id"))
        }
         fetchData(); 
     }, []); 
+
+    useEffect(() => {
+        setUserId(sessionStorage.getItem("user_id"))
+        if(userId != null){
+            setbtnLink("/review")
+        } else { 
+            setbtnLink("/login")
+        }
+    }, [userId]);
 
     const handleOpenFilter = () => { 
         setOpenFilter(!openFilter);
@@ -58,7 +67,7 @@ export default function Home() {
             </div>
         )}
              {openFilter && <Filter/>}
-        <button><Link to = {"/review"}>My Reviews</Link></button>
+        <button><Link to = {btnLink}>My Reviews </Link></button>
         </div>
     )
 }
