@@ -51,11 +51,11 @@ return (
                 </h3>
                 <button onClick = {() => handleDelete(item[6])}> Delete </button>
                 <button onClick = {() => handleUpdateToggle()}> Update </button>
-                {updateToggle && <div>
-                    <form onSubmit={() => handleUpdate(item[6])}> 
+                {updateToggle && <div className = "reviewContainer">
+                    <form  className = "postReview" onSubmit={() => handleUpdate(item[6])}> 
                         <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
                         <br/>
-                        <textarea onInput = {e => setReviewText(e.target.value)}>Keyboard Warriors UNITE</textarea>
+                        <textarea onInput = {e => setReviewText(e.target.value)} placeholder='Keyboard Warriors UNITE'></textarea>
                         <button type = "submit">Update!</button>
                     </form>
                 </div>}

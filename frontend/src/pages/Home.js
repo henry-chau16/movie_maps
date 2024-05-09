@@ -49,6 +49,9 @@ export default function Home() {
             <Navigation/>
             {loading ? (<p>Loading..</p>) : (
             <div>
+                {openFilter &&  <div className="filter-popup"><Filter/></div>}
+                <div className = "modal-overlay" style={{ position: "relative" }}>
+                <div className = "search">
                 <button onClick = {() => handleOpenFilter()}>Filter</button>
                 <input
                     type = "text"
@@ -58,12 +61,17 @@ export default function Home() {
                     }}
                 />
                 <button onClick = {() => handleSearchTitle()}>Search</button>
-
+                <button><Link to = {"/review"}>My Reviews</Link></button>
+                </div>
+                
+                <div className="grid-container">
                 {titles && titles.map((title) => ( //goes to either movie or episode 
                     <Link key={title[0]} to={`/${title[2] === 'movie' ? 'movie' : 'series'}/${title[0]}`}>
                         <button>{title[1]}</button>
                     </Link>
                 ))}
+                </div>
+                </div>
             </div>
         )}
              {openFilter && <Filter/>}

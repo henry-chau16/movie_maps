@@ -26,7 +26,7 @@ return (
         <Navigation/>
         <h1>Episode List</h1>
         {loading ? (<p>Loading..</p>) : (
-        <div>
+        <div className = "grid-container">
             {episodes && episodes.map((item) => (
                 <Link key= {item[0]} to={`/episode?parentId=${titleId}&episodeId=${item[0]}&episodeNum=${item[1]}&season=${item[2]}`}>
                 <button>Episode: {item[1]} - Season: {item[2]}</button>

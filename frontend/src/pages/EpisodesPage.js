@@ -89,7 +89,7 @@ export default function EpisodesPage() {
         </div>
         <div className = "userReviews"> 
           <h2>User Reviews: </h2>
-          <div>
+          <div className = "reviewContainer">
           {isLoggedIn ? (
               <form onSubmit = {postReview}> 
                 <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
@@ -103,7 +103,7 @@ export default function EpisodesPage() {
           </div>
           <div>
             {userReviews && userReviews.map((reviews) => (
-              <div key={reviews[0]}>
+              <div className = "userReview" key={reviews[0]}>
               <p>Username: {reviews[1]}</p>
               <p>Rating: {reviews[2]}</p>
               <p>{reviews[3]}</p>

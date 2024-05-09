@@ -22,7 +22,11 @@ export default function Navigation() {
         window.location.reload();
     }
     return (
-        <div className = "links">
+        <div className = "navigation">
+            <div className = "title">
+                <Link to = "/">Movie Maps</Link>
+            </div>
+            <div className = "options">
             <Link to = "/">Home</Link>
             <Link to = "/register">Register</Link>
             {isLoggedIn ? (
@@ -30,7 +34,7 @@ export default function Navigation() {
             ): (
                 <Link to = "/login">Login</Link>
             )}
-            
+            </div>
         </div>
     )
 }

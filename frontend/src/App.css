@@ -1,38 +1,121 @@
-.App {
+:root {
+  --main-yellow-color: rgb(252, 204, 81);
+  --secondary-yellow-color: rgb(255, 249, 189);
+}
+
+* { 
   text-align: center;
+  font-family: 'Roboto', sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+
+a {
+  text-decoration: none;
+  color: black;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+ul {
+  list-style-type: none;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+
+button { 
+  background-color: var(--main-yellow-color);
+  border: none; 
+  border-radius: 5px;
+  padding: 10px 10px;
+}
+
+button:hover {
+  background-color: #ebe2b9; 
+}
+
+.container {
   display: flex;
-  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+  height: 100vh; 
+  background-color: rgb(234, 234, 234);
+}
+
+form {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  background-color: white;
+  width: 200px;
+  height: 500px;
 }
 
-.App-link {
-  color: #61dafb;
+form > input { 
+  margin-block:20px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.container > form { 
+  height: 300px;
+}
+
+/*Navigation CSS */
+.navigation { 
+  background-color: var(--main-yellow-color);
+  padding: 20px;
+}
+.title { 
+  text-align: left;
+}
+.options { 
+  display: flex;
+  justify-content: flex-end;
+}
+
+.options > * {
+  margin-right: 10px;
+}
+
+/*HomePage CSS*/
+.search { 
+  padding-block: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  grid-gap: 10px;
+}
+
+
+.grid-container > a > button {
+  background-color: white;
+  width: 100px;
+  height: 100px;
+  border: solid;
+  padding: 0px 0px;
+}
+
+/* Filter popup */
+.filter-popup {
+  position: absolute;
+  z-index: 1000;
+  top: 20px; 
+  left: 0px; 
+  padding: 20px;
+  border-radius: 5px;
+}
+
+/*Review CSS */
+.postReview { 
+  height: 200px; 
+}
+
+.reviewContainer { 
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+}
+.userReview { 
+  background-color: rgb(250, 250, 245)
 }
