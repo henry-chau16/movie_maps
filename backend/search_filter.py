@@ -10,7 +10,7 @@ def filter(conn, genres, start, end, titleType):
     """
     SQLConn(conn, "television.db", "Drop view if exists Filters;")
 
-    command="Select titleID, titleName,startYear,endYear, genre " \
+    command="Select titleID, titleName, titleType, startYear,endYear, genre " \
             "from TelevisionDB t " \
             "where "
     if(genres != "n"):
