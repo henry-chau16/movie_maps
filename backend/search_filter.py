@@ -39,7 +39,8 @@ def filter(conn, genres, start, end, titleType):
         if(genres != "n" or start != "n" or end != "n"):
             command += " and"
         command += " TitleType = '"+titleType+"'"
-
+    if(genres == "n" and start == "n" and end == "n" and titleType == "n"):
+        command = "Select * From TelevisionDB"
     command = "Create view Filters as " + command + ";"
     print(command)
     return SQLConn(conn, "television.db",command)

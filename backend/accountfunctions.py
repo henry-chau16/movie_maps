@@ -30,7 +30,7 @@ def verifyLogin(conn, username, password):
     return False
 
 def getUserReviews(conn, accountID):
-    command = "SELECT TitleName, Rating, Review, StartYear, TitleType, Genre, RatingID FROM UserRatingsDB u INNER JOIN TelevisionDB t ON u.TitleID = t.TitleID WHERE AccountID = "+str(accountID)+";"
+    command = "SELECT TitleName, Rating, Review, StartYear, TitleType, Genre, RatingID FROM UserRatingsDB u FULL JOIN TelevisionDB t ON u.TitleID = t.TitleID WHERE AccountID = "+str(accountID)+";"
     return(dbfunctions.SQLConn(conn, "television.db", command))
 
 def createReviews(conn, titleID, accountID, rating, review):
@@ -63,18 +63,18 @@ def encrypt(password, salt):
 
 #test
 #account creations
-#conn = dbfunctions.dbConnect()
+conn = dbfunctions.dbConnect()
 
 #createAccount(conn, "User", "Pass")
 #verifyLogin(conn, "User", "Pass")
-#userID = searchAccountID(conn, "User") 
+userID = searchAccountID(conn, "User") 
 
 #reviews
 #createReviews(conn, "tt0002591", str(userID[0][0]), str(10), "slaps") 
 #createReviews(conn, "tt0000009", str(userID[0][0]), str(10), "slaps") 
 #createReviews(conn, "tt29899777", str(userID[0][0]), str(10), "slaps") 
 #updateReview(conn, 1, 7, "Good")
-#print(getUserReviews(conn, str(userID[0][0])))
+print(getUserReviews(conn, str(userID[0][0])))
 #print(fetchReviews(conn, "tt29899777"))
 
 #dbfunctions.dbClose(conn)
