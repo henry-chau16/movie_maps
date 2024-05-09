@@ -69,17 +69,17 @@ export default function MoviePage() {
         </div>
         <div className = "userReviews"> 
           <h2>User Reviews: </h2>
-          <div>
-            <form onSubmit = {postReview}> 
+          <div className = "reviewContainer">
+            <form onSubmit = {postReview} className = "postReview"> 
              <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
              <br/>
-             <textarea onInput = {e => setReviewText(e.target.value)}>Keyboard Warriors UNITE</textarea>
+             <textarea onInput = {e => setReviewText(e.target.value)} placeholder='Keyboard Warriors UNITE'></textarea>
              <button type = "submit">Post!</button>
             </form>
           </div>
           <div>
             {userReviews && userReviews.map((reviews) => (
-              <div key={reviews[0]}>
+              <div className = "userReview" key={reviews[0]}>
               <p>Username: {reviews[1]}</p>
               <p>Rating: {reviews[2]}</p>
               <p>{reviews[3]}</p>
