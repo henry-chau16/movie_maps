@@ -17,8 +17,8 @@ export async function login(username, password) {
         }
         const data = await response.json()
         const userId = data.user_id;
-        localStorage.setItem("user_id", userId); //stores id in local storage for persisting 
-        localStorage.setItem("username", username);
+        sessionStorage.setItem("user_id", userId); //stores id in local storage for persisting 
+        sessionStorage.setItem("username", username);
     }
     catch (error) { 
         throw error;

@@ -6,7 +6,7 @@ import { deleteReviews, getReviews, updateReviews } from "../api/Reviews";
 import { enterTitle } from "../api/ApiFunctions";
 
 export default function ReviewPage(){
-    const user_id = localStorage.getItem("user_id")
+    const user_id = sessionStorage.getItem("user_id")
     const[loading, setLoading] = useState(false);
     const [reviews, setReviews] = useState([])
     const [rating, setRating] = useState(5)

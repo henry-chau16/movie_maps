@@ -3,7 +3,7 @@
 //initial homepage
     export async function displayTitles() {
         try { 
-            const response = await fetch(backendUrl + '/select/years?startYr=2024');
+            const response = await fetch(backendUrl + '/show/50');
             const data = await response.json();
             if (response.ok) {
                 return data; 

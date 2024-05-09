@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { useEffect, useState } from 'react';
 import { enterTitle, getRating } from "../api/ApiFunctions"
@@ -17,6 +17,8 @@ export default function EpisodesPage() {
   const [userReviews, setUserReviews] = useState([]); 
   const [rating, setRating] = useState(5)
   const [reviewText, setReviewText] = useState("");
+  const [userId, setUserId] = useState(null)
+  const [isLoggedIn, setLogIn] = useState(false)
 
   const[loading, setLoading] = useState(false);
 
@@ -27,7 +29,7 @@ export default function EpisodesPage() {
   async function fetchRatingInfo() { 
     const apiResponse = await getRating(episodeId);
     if (apiResponse.length === 0) { 
-      setRatingInfo(["N/A", "N/A"])
+      setRatingInfo(["0", "0"])
     }
     else { 
       setRatingInfo(apiResponse[0]);
@@ -41,6 +43,13 @@ export default function EpisodesPage() {
       setUserReviews(apiResponse);
     }
   } 
+
+  useEffect(() => {
+    setUserId(sessionStorage.getItem("user_id"))
+    if(userId != null){
+      setLogIn(true)
+    }
+  }, [userId]);
 
   useEffect(() => {
     setLoading(true);
@@ -59,9 +68,9 @@ export default function EpisodesPage() {
 
 
    async function postReview(e){
-    e.preventDefault(); //error the url gets reset upon refresh
-    console.log(localStorage.getItem("user_id"), episodeId, rating, reviewText)
-    createReview(localStorage.getItem("user_id"), episodeId, rating, reviewText)
+    e.preventDefault();
+    console.log(userId, episodeId, rating, reviewText)
+    createReview(userId, episodeId, rating, reviewText)
   } 
   return (
     <div>
@@ -81,12 +90,16 @@ export default function EpisodesPage() {
         <div className = "userReviews"> 
           <h2>User Reviews: </h2>
           <div className = "reviewContainer">
-            <form className = "postReview" onSubmit = {postReview}> 
-             <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
-             <br/>
-             <textarea onInput = {e => setReviewText(e.target.value)} placeholder='Keyboard Warriors UNITE'></textarea>
-             <button type = "submit">Post!</button>
-            </form>
+          {isLoggedIn ? (
+              <form onSubmit = {postReview}> 
+                <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
+                <br/>
+                <textarea onInput = {e => setReviewText(e.target.value)}>Keyboard Warriors UNITE</textarea>
+                <button type = "submit">Post!</button>
+             </form>
+            ): (
+              <button><Link to = "/login">Login to post reviews! </Link></button>
+            )}
           </div>
           <div>
             {userReviews && userReviews.map((reviews) => (
