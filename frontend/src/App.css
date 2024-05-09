@@ -83,15 +83,15 @@ form > input {
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  grid-template-columns: repeat(3, 1fr); 
   grid-gap: 10px;
 }
 
 
 .grid-container > a > button {
   background-color: white;
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border: solid;
   padding: 0px 0px;
 }

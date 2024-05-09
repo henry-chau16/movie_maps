@@ -61,7 +61,7 @@ export default function Home() {
                     }}
                 />
                 <button onClick = {() => handleSearchTitle()}>Search</button>
-                <button><Link to = {"/review"}>My Reviews</Link></button>
+                <button><Link to = {btnLink}>My Reviews </Link></button>
                 </div>
                 
                 <div className="grid-container">
@@ -75,7 +75,6 @@ export default function Home() {
             </div>
         )}
              {openFilter && <Filter/>}
-        <button><Link to = {btnLink}>My Reviews </Link></button>
         </div>
     )
 }

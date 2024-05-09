@@ -91,7 +91,7 @@ export default function EpisodesPage() {
           <h2>User Reviews: </h2>
           <div className = "reviewContainer">
           {isLoggedIn ? (
-              <form onSubmit = {postReview}> 
+              <form className = "postReview" onSubmit = {postReview}> 
                 <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
                 <br/>
                 <textarea onInput = {e => setReviewText(e.target.value)}>Keyboard Warriors UNITE</textarea>

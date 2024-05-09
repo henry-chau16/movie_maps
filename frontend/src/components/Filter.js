@@ -58,7 +58,7 @@ export default function Filter() {
                 />
             </ul>
             <button type = "submit">Filter</button>
-            <button onClick = {() => handleClearFilter()}>Clear Filter</button>
+            {/*<button onClick = {() => handleClearFilter()}>Clear Filter</button> */}
         </form>
         </div>
     )

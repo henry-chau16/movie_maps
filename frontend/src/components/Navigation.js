@@ -27,7 +27,6 @@ export default function Navigation() {
                 <Link to = "/">Movie Maps</Link>
             </div>
             <div className = "options">
-            <Link to = "/">Home</Link>
             <Link to = "/register">Register</Link>
             {isLoggedIn ? (
                 <Link onClick = {() => handleLogBtn()} >Log Out</Link>
