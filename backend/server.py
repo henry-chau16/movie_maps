@@ -61,6 +61,13 @@ def select_years(startYr: str = Query(...), endYr: str = "n"):
         return search_filter.selectYears(conn, startYr, endYr)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Cannot filter by years")
+    
+@app.get("/show/{amount}")
+def show_amount(amount: int):
+    try:
+        return search_filter.showAmount(conn, amount)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Cannot display titles")
 
 @app.get("/search/ratings/{id}")
 def search_ratings(id: str):

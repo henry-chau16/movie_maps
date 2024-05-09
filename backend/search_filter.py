@@ -82,6 +82,10 @@ def searchTitle(conn, searchValue):
     command=command + " order by titleName LIMIT 50"
     return SQLConn(conn, "television.db",command)
 
+def showAmount(conn, amount):
+    command = "Select * from Filters order by TitleName LIMIT "+str(amount)+";"
+    return SQLConn(conn, "television.db", command)
+
 def enterTitle(conn, titleID): 
     id = titleID.strip()
     command = "Select * from TelevisionDB where TitleID = '{id}'".format(id = id)
