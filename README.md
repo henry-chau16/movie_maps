@@ -5,12 +5,12 @@ Application supports user accounts which allow the users to search for shows/mov
 
 The project contains a backend API with CRUD operations using REST API architecture. There are various database functionalities such as triggers and views. 
 
-# == Tech Stack == #
+# Tech Stack #
 Frontend: React.js
 Backend: Python (FastAPI)
 Database: SQLite
 
-# == How To Run == #
+# How To Run #
 Initial Setup:
 1. To run the repository, download the following IMDB datasets below and place them in the project:
 https://datasets.imdbws.com/
