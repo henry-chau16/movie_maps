@@ -1,29 +1,55 @@
 import sqlite3
+import dbfunctions
 
-def filterGenre(genres):
+def filter(conn, genres, start, end, titleType):
     """
     Function to filter by genre in televisionDB table for search value
     :param genres: list to match to genres
     :return: list of TVseries  tuple data matching the search criteria sorted by titleName.
     Tuples consist of titleID, titleName, startYear, endYear, genre
     """
-    gen=genres.strip()
+    SQLConn(conn, "television.db", "Drop view if exists Filters;")
 
-    command="Select titleID, titleName,startYear,endYear, genre " \
+    command="Select titleID, titleName, titleType, startYear,endYear, genre " \
             "from TelevisionDB t " \
             "where "
+    if(genres != "n"):
+        gen=genres.strip()
+        genreList = gen.split(',')
+        genre_conditions = []
+        for genre in genreList:
+            genre_conditions.append("genre LIKE '%{:s}%'".format(genre.strip()))
+        
+        command += " OR ".join(genre_conditions) 
     
-    genres = gen.split(',')
-    genre_conditions = []
-    for genre in genres:
-        genre_conditions.append("genre LIKE '%{:s}%'".format(genre.strip()))
-    
-    command += " OR ".join(genre_conditions) 
+    if (start != "n" and end != "n"):
+        if(genres != "n"):
+            command+= " and"
+        command += " startYear between "+start+" and "+end
+    elif (start != "n" and end == "n"):
+        if(genres != "n"):
+            command+= " and"
+        command += " startYear >= "+start
+    elif (start == "n" and end != "n"):
+        if(genres != "n"):
+            command+= " and"
+        command += " startYear <= "+end
 
-    command=command + " order by titleName"
-    return SQLConn("television.db",command)
+    if(titleType != "n"):
+        if(genres != "n" or start != "n" or end != "n"):
+            command += " and"
+        command += " TitleType = '"+titleType+"'"
+    if(genres == "n" and start == "n" and end == "n" and titleType == "n"):
+        command = "Select * From TelevisionDB"
+    command = "Create view Filters as " + command + ";"
+    print(command)
+    return SQLConn(conn, "television.db",command)
 
-def filterYears(startYr, endYr):
+def clearFilters(conn):
+    SQLConn(conn, "television.db", "Drop view if exists Filters;")
+    SQLConn(conn, "television.db", "Create view Filters as Select * from TelevisionDB;")
+
+def selectYears(conn, startYr, endYr):
     """
     Function to filter by years in televisionDB table by start and end year.
     :param startYr: int to match to startYear endYr: int to match to endYear
@@ -32,17 +58,17 @@ def filterYears(startYr, endYr):
     """
     print(startYr, endYr)
     if (endYr != "n"):
-        command = "Select titleID, titleName,startYear,endYear, genre " \
-            "from TelevisionDB t " \
-            "where startYear = '{sY}' and endYear = '{eY}' order by titleName".format(sY = startYr, eY = endYr)
+        command = "Select * " \
+            "from Filters " \
+            "where startYear = {sY} and endYear = {eY} order by titleName".format(sY = startYr, eY = endYr)
     else:
-        command = "Select titleID, titleName,startYear,endYear, genre " \
-            "from TelevisionDB t " \
-            "where startYear = '{sY}' order by titleName".format(sY = startYr)
-        
-    return SQLConn("television.db", command)
+        command = "Select * " \
+            "from Filters " \
+            "where startYear = {sY} order by titleName LIMIT 50".format(sY = startYr)
+    print(command)
+    return SQLConn(conn, "television.db", command)
 
-def searchTitle(searchValue):
+def searchTitle(conn, searchValue):
     """
     Function to search titleName in televisionDB table for search value
     :param searchValue: string to match to titleName
@@ -51,13 +77,33 @@ def searchTitle(searchValue):
     """
     sv=searchValue.strip()
 
-    command="Select TitleName, TitleType, StartYear, EndYear " \
-            "from TelevisionDB " \
+    command="Select * " \
+            "from Filters " \
             "where TitleName like '%{:s}%'".format(sv)
-    command=command + " order by titleName LIMIT 5"
-    return SQLConn("television.db",command)
+    command=command + " order by titleName LIMIT 50"
+    return SQLConn(conn, "television.db",command)
 
-def SQLConn(database, command):
+def showAmount(conn, amount):
+    command = "Select * from Filters order by TitleName LIMIT "+str(amount)+";"
+    return SQLConn(conn, "television.db", command)
+
+def enterTitle(conn, titleID): 
+    id = titleID.strip()
+    command = "Select * from TelevisionDB where TitleID = '{id}'".format(id = id)
+    return SQLConn(conn, "television.db",command)
+
+def listEpisodes(conn, titleID):
+    id = titleID.strip()
+    command = "Select EpisodeID, EpisodeNum, SeasonNum FROM EpisodeDB where ParentID = '"+id+"' order by SeasonNum asc, EpisodeNum asc;"
+    print(command)
+    return SQLConn(conn, "television.db",command)
+
+def searchRating(conn, titleID):
+    id = titleID.strip()
+    command = "Select Rating, NumVotes FROM RatingsDB where TitleID = '"+id+"';"
+    return SQLConn(conn, "television.db",command)
+
+def SQLConn(conn, database, command):
     """
     Function to make SQl connection to database and perform passed command.  Opens connection, executes command,
     commits and closes connection.
@@ -66,13 +112,18 @@ def SQLConn(database, command):
     :return: result of SQL command
     """
     try:
-        conn=sqlite3.connect(database)
         cur=conn.cursor()
         cur.execute(command)
         result=cur.fetchall()
         #print(result)
         conn.commit()
-        conn.close()
         return result
     except Exception as e:
         print (e)
+
+
+conn = dbfunctions.dbConnect()
+clearFilters(conn)
+
+
+dbfunctions.dbClose(conn)
