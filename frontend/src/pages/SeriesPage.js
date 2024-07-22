@@ -9,7 +9,6 @@ export default function SeriesPage(){
     const[loading, setLoading] = useState(false);
     const [episodes, setEpisodes] = useState([])
 
-
     useEffect(() => { //replace with call to api once results limited
         setLoading(true);
         const fetchData = async () => { 
@@ -19,7 +18,7 @@ export default function SeriesPage(){
          setLoading(false);
         }
          fetchData(); 
-     }, []); 
+     }, [titleId]); 
 
 return (
     <div className = "Episode List">
@@ -27,11 +26,11 @@ return (
         <h1>Episode List</h1>
         {loading ? (<p>Loading..</p>) : (
         <div className = "grid-container">
-            {episodes && episodes.map((item) => (
+            {episodes.length !== 0 ? episodes.map((item) => (
                 <Link key= {item[0]} to={`/episode?parentId=${titleId}&episodeId=${item[0]}&episodeNum=${item[1]}&season=${item[2]}`}>
                 <button>Episode: {item[1]} - Season: {item[2]}</button>
                 </Link>
-            ))}
+            )): <p>Episode data not found</p>}
         </div>
     )}
     </div>

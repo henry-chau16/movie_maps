@@ -2,8 +2,6 @@ import dbfunctions
 import os
 import hashlib
 
-#TODO: For the triggers make an entry in RatingsDB if it doesn't exist 
-
 def createAccount(conn, username, password):
     salt = generate_salt()
     hashed_password = encrypt(password, salt)
@@ -62,7 +60,7 @@ def encrypt(password, salt):
 
 
 #test
-#account creations
+'''account creations
 conn = dbfunctions.dbConnect()
 
 #createAccount(conn, "User", "Pass")
@@ -77,4 +75,4 @@ userID = searchAccountID(conn, "User")
 print(getUserReviews(conn, str(userID[0][0])))
 #print(fetchReviews(conn, "tt29899777"))
 
-#dbfunctions.dbClose(conn)
+#dbfunctions.dbClose(conn)'''

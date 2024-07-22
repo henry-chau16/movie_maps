@@ -1,9 +1,6 @@
 import {useState, useEffect } from "react";
 import Navigation from "../components/Navigation";
-import { Link } from "react-router-dom";
-import { useParams } from 'react-router-dom';
 import { deleteReviews, getReviews, updateReviews } from "../api/Reviews";
-import { enterTitle } from "../api/ApiFunctions";
 
 export default function ReviewPage(){
     const user_id = sessionStorage.getItem("user_id")
@@ -43,9 +40,9 @@ return (
         <h1>Review List</h1>
         {loading ? (<p>Loading..</p>) : (
         <div>
-            {reviews && reviews.map((item) => (
+            {reviews.length !== 0 ? reviews.map((item) => (
             <>
-                <h2 style = {{textAlign : 'Left'}} > Title: {item[0]} {item[3]} Type: {item[4]} Genre: {item[5]}
+                <h2 style = {{textAlign : 'Left'}} > Title: {item[0]} Date: {item[3]} Type: {item[4]} Genre: {item[5]}
                 </h2>
                 <h3 style = {{textAlign : 'Left'}} > Rating: {item[1]}  Review: {item[2]}
                 </h3>
@@ -53,14 +50,14 @@ return (
                 <button onClick = {() => handleUpdateToggle()}> Update </button>
                 {updateToggle && <div className = "reviewContainer">
                     <form  className = "postReview" onSubmit={() => handleUpdate(item[6])}> 
-                        <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
+                    {rating}/10<input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/>
                         <br/>
                         <textarea onInput = {e => setReviewText(e.target.value)} placeholder='Keyboard Warriors UNITE'></textarea>
                         <button type = "submit">Update!</button>
                     </form>
                 </div>}
             </>
-            ))}
+            )): (<p>No reviews found</p>)}
         </div>
     )}
     </div>

@@ -1,5 +1,5 @@
 import {Link} from "react-router-dom"; 
-import {useState, useEffect, redirect } from "react";
+import {useState, useEffect} from "react";
 
 export default function Navigation() { 
     const [userId, setUserId] = useState(null);
@@ -24,7 +24,7 @@ export default function Navigation() {
     return (
         <div className = "navigation">
             <div className = "title">
-                <Link to = "/">Movie Maps</Link>
+                <Link to = "/"><h1>Movie Maps</h1></Link>
             </div>
             <div className = "options">
             <Link to = "/register">Register</Link>
