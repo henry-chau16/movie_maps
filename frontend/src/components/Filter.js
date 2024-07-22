@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { filter, clearFilter} from "../api/ApiFunctions";
 
-export default function Filter() {
+export default function Filter({closeFilter}) {
 
     const [genres, setGenres] = useState([]);
     const [type, setType] = useState("n"); 
@@ -30,6 +30,8 @@ export default function Filter() {
     return (
         <div className = "filter">
         <form onSubmit = {handleFilter}>
+            <button onClick = {closeFilter} style={{
+       backgroundColor:'transparent',  alignSelf: 'flex-start'}}>X</button>
             <ul> 
                 <li>Type</li>
                 <select onChange = {(e) => setType(e.target.value)}>
@@ -58,7 +60,7 @@ export default function Filter() {
                 />
             </ul>
             <button type = "submit">Filter</button>
-            {/*<button onClick = {() => handleClearFilter()}>Clear Filter</button> */}
+            <button onClick = {() => handleClearFilter()}>Clear Filter</button>
         </form>
         </div>
     )

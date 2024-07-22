@@ -1,12 +1,13 @@
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Navigation from '../components/Navigation';
-import { useEffect, useState } from 'react';
+import AddReview from '../components/AddReview';
+import { useEffect, useState, useCallback } from 'react';
 import { enterTitle, getRating } from "../api/ApiFunctions"
-import { getReviews, createReview } from "../api/Reviews"
+import { getReviews} from "../api/Reviews"
 
 //@TODO: Fix the post reviews
 export default function EpisodesPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const parentId = searchParams.get("parentId")
   const episodeId = searchParams.get("episodeId")
   const episodeNum = searchParams.get("episodeNum")
@@ -15,41 +16,35 @@ export default function EpisodesPage() {
   const [titleInfo, setTitleInfo] = useState({});
   const [ratingInfo, setRatingInfo] = useState([]); 
   const [userReviews, setUserReviews] = useState([]); 
-  const [rating, setRating] = useState(5)
-  const [reviewText, setReviewText] = useState("");
-  const [userId, setUserId] = useState(null)
-  const [isLoggedIn, setLogIn] = useState(false)
+  const [addReviewToggle, setAddReviewToggle] = useState(false);
 
   const[loading, setLoading] = useState(false);
 
-  async function fetchTitleInfo() {
+  const fetchTitleInfo = useCallback(async () => {
     const apiResponse = await enterTitle(parentId);
     setTitleInfo(apiResponse[0]);
-  }
-  async function fetchRatingInfo() { 
+  }, [parentId]);
+
+  const fetchRatingInfo = useCallback(async () => {
     const apiResponse = await getRating(episodeId);
-    if (apiResponse.length === 0) { 
-      setRatingInfo(["0", "0"])
-    }
-    else { 
+    if (apiResponse.length === 0) {
+      setRatingInfo(["0", "0"]);
+    } else {
       setRatingInfo(apiResponse[0]);
     }
-  }
-  
-  async function fetchUserReviews() { 
+  }, [episodeId]);
+
+  const fetchUserReviews = useCallback(async () => {
     const apiResponse = await getReviews("title", episodeId);
-    console.log("review info", apiResponse)
-    if (apiResponse.length > 0) { 
+    console.log("review info", apiResponse);
+    if (apiResponse.length > 0) {
       setUserReviews(apiResponse);
     }
-  } 
-
-  useEffect(() => {
-    setUserId(sessionStorage.getItem("user_id"))
-    if(userId != null){
-      setLogIn(true)
-    }
-  }, [userId]);
+  }, [episodeId]);
+  
+  function toggleReview() { 
+    setAddReviewToggle(!addReviewToggle);
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -57,21 +52,8 @@ export default function EpisodesPage() {
     fetchUserReviews(); 
     fetchRatingInfo(); 
     setLoading(false);
-    }, [parentId]); 
+    }, [fetchRatingInfo, fetchTitleInfo, fetchUserReviews]); 
 
-  useEffect(() => {
-    setLoading(true);
-    fetchUserReviews(); 
-    fetchRatingInfo(); 
-    setLoading(false);
-    }, [ rating, reviewText]); 
-
-
-   async function postReview(e){
-    e.preventDefault();
-    console.log(userId, episodeId, rating, reviewText)
-    createReview(userId, episodeId, rating, reviewText)
-  } 
   return (
     <div>
       <Navigation/>
@@ -79,36 +61,24 @@ export default function EpisodesPage() {
         <>
         <div className = "Show Info">
           <h1>{titleInfo[1]}</h1>
+          <h2>Episode: {episodeNum} - Season {season} </h2>
           <p>Release Date: {titleInfo[3]}</p>
           <p>Genre: {titleInfo[5]}</p> 
-          <p>Rating: {ratingInfo[0]} </p>
+          <p>Rating: {parseFloat(ratingInfo[0]).toFixed(1)} </p>
           <p> Votes: {ratingInfo[1]}</p>
         </div>
-        <div> 
-            <h2>Episode: {episodeNum} - Season {season} </h2>
-        </div>
         <div className = "userReviews"> 
+          <button onClick={toggleReview}>Add My Review</button>
+          {addReviewToggle && <AddReview watchId={episodeId} isEpisode= {true}/>}
           <h2>User Reviews: </h2>
-          <div className = "reviewContainer">
-          {isLoggedIn ? (
-              <form className = "postReview" onSubmit = {postReview}> 
-                <input type="range" min="0" max="10" defaultValue="5" onInput = {e =>setRating(e.target.value)} class="slider" id="myRange"/> {rating}/10
-                <br/>
-                <textarea onInput = {e => setReviewText(e.target.value)}>Keyboard Warriors UNITE</textarea>
-                <button type = "submit">Post!</button>
-             </form>
-            ): (
-              <button><Link to = "/login">Login to post reviews! </Link></button>
-            )}
-          </div>
           <div>
-            {userReviews && userReviews.map((reviews) => (
+            {userReviews.length !==0 ? userReviews.map((reviews) => (
               <div className = "userReview" key={reviews[0]}>
               <p>Username: {reviews[1]}</p>
               <p>Rating: {reviews[2]}</p>
               <p>{reviews[3]}</p>
               </div>
-            ))}
+            )): <p>No user reviews found.</p>}
           </div>
         </div>
         </>

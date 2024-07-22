@@ -14,7 +14,7 @@ export default function Home() {
     const [userId, setUserId] = useState(null);
     const [btnLink, setbtnLink] = useState("/login");
 
-    useEffect(() => { //replace with call to api once results limited
+    useEffect(() => {
        setLoading(true);
        const fetchData = async () => { 
         const apiResponse = await displayTitles();
@@ -34,7 +34,11 @@ export default function Home() {
     }, [userId]);
 
     const handleOpenFilter = () => { 
-        setOpenFilter(!openFilter);
+        setOpenFilter(true);
+    }
+
+    const closeFilter = () => { 
+        setOpenFilter(false); 
     }
 
     async function handleSearchTitle() { 
@@ -45,11 +49,11 @@ export default function Home() {
     }
     
     return (
-        <div className = "Home">
+        <div className={`Home ${openFilter ? 'gray-out' : ''}`}>
             <Navigation/>
             {loading ? (<p>Loading..</p>) : (
             <div>
-                {openFilter &&  <div className="filter-popup"><Filter/></div>}
+                {openFilter &&  <div className="filter-popup"><Filter closeFilter = {closeFilter}/></div>}
                 <div className = "modal-overlay" style={{ position: "relative" }}>
                 <div className = "search">
                 <button onClick = {() => handleOpenFilter()}>Filter</button>
