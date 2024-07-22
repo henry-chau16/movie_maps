@@ -7,7 +7,7 @@ import { getReviews} from "../api/Reviews"
 
 //@TODO: Fix the post reviews
 export default function EpisodesPage() {
-  const searchParams = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const parentId = searchParams.get("parentId")
   const episodeId = searchParams.get("episodeId")
   const episodeNum = searchParams.get("episodeNum")
